@@ -43,12 +43,25 @@ const technicianRoutes = require('./routes/technicianRoutes');
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  console.log('✅ Health check endpoint hit');
   res.status(200).json({ 
     status: 'OK', 
     message: 'Server is running',
     timestamp: new Date().toISOString(),
     mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
+});
+
+// Simple test endpoint
+app.get('/api/test', (req, res) => {
+  console.log('✅ Test endpoint hit');
+  res.status(200).json({ message: 'API is working!' });
+});
+
+// Log all requests
+app.use((req, res, next) => {
+  console.log(`📝 ${req.method} ${req.path}`);
+  next();
 });
 
 app.use('/api/auth', authRoutes);
