@@ -1,5 +1,5 @@
-// API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+// Hardcoded Railway API URL
+const API_BASE_URL = "https://nivasa-production-7aa9.up.railway.app";
 
 export const API_ENDPOINTS = {
   // Auth endpoints
