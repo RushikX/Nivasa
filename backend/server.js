@@ -9,10 +9,10 @@ const PORT = process.env.PORT || 5001; // Vercel will set its own PORT
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:8080', 'http://localhost:3000', 'https://*.railway.app', 'https://*.vercel.app'],
+  origin: true, // Allow all origins for debugging
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
 app.use(express.json());
 
@@ -61,6 +61,8 @@ app.get('/api/test', (req, res) => {
 // Log all requests
 app.use((req, res, next) => {
   console.log(`📝 ${req.method} ${req.path}`);
+  console.log(`🔍 Headers:`, req.headers);
+  console.log(`📦 Body:`, req.body);
   next();
 });
 
