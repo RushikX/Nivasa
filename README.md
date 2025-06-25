@@ -1,71 +1,67 @@
 # 🏢 Nivasa — Apartment Administration System
-A modern, full-stack web application for managing apartment communities, built with React, Node.js, Express, and MongoDB.
 
-🚀 Live Site
-Site:
-🔗 https://nivasa-production-7aa9.up.railway.app
+A **modern, full-stack web application** for managing apartment communities, built with **React**, **Node.js**, **Express**, and **MongoDB**.
 
-📚 Table of Contents
-✨ Features
+---
 
-🛠️ Tech Stack
+## 🚀 Live Demo
 
-📁 Project Structure
+> 🔗 [https://nivasa-production-7aa9.up.railway.app](https://nivasa-production-7aa9.up.railway.app)
 
-🧑‍💻 Getting Started (Local)
+---
 
-☁️ Deployment (Railway)
+## 📚 Table of Contents
 
-🔑 Environment Variables
+- [✨ Features](#✨-features)
+- [🛠️ Tech Stack](#🛠️-tech-stack)
+- [📁 Project Structure](#📁-project-structure)
+- [🧑‍💻 Getting Started (Local)](#🧑‍💻-getting-started-local)
+- [☁️ Deployment (Railway)](#☁️-deployment-railway)
+- [🔑 Environment Variables](#🔑-environment-variables)
+- [🔌 API Overview](#🔌-api-overview)
+- [🛠️ Customization](#🛠️-customization)
+- [🤝 Contributing](#🤝-contributing)
+- [📄 License](#📄-license)
 
-🔌 API Overview
+---
 
-🛠️ Customization
+## ✨ Features
 
-🤝 Contributing
+### 🧑‍💼 Tenants
+- Create and track maintenance tickets  
+- View ticket status and history  
+- View and contact neighbors  
+- See maintenance payment history  
 
-📄 License
+### 🧑‍💼 Admins
+- Real-time dashboard with ticket stats  
+- Manage tenants and technicians  
+- Approve/reject maintenance payments  
+- Set maintenance fees and bank details  
 
-✨ Features
-🧑‍💼 Tenants
-Create and track maintenance tickets
+### ⚙️ General
+- Role-based dashboards (Admin/Tenant/Technician)  
+- Responsive UI (desktop & mobile)  
+- Real-time notifications (toasts)  
+- Secure authentication (JWT)  
 
-View ticket status and history
+---
 
-View and contact neighbors
+## 🛠️ Tech Stack
 
-See maintenance payment history
+| Layer        | Tech                                       |
+| ------------ | ----------------------------------------- |
+| **Frontend** | React (Vite + TypeScript), Tailwind CSS, shadcn/ui, React Query |
+| **Backend**  | Node.js, Express.js, Mongoose             |
+| **Database** | MongoDB (local or MongoDB Atlas)          |
+| **Deployment** | Railway                                 |
+| **Icons**    | Lucide React                              |
 
-🧑‍💼 Admins
-Real-time dashboard with ticket stats
+---
 
-Manage tenants and technicians
+## 📁 Project Structure
 
-Approve/reject maintenance payments
-
-Set maintenance fees and bank details
-
-⚙️ General
-Role-based dashboards (Admin/Tenant/Technician)
-
-Responsive UI for all devices
-
-Real-time notifications (toasts)
-
-Secure authentication with JWT
-
-🛠️ Tech Stack
-Layer	Tech
-Frontend	React (Vite + TypeScript), Tailwind CSS, shadcn/ui, React Query
-Backend	Node.js, Express.js, Mongoose
-Database	MongoDB (local or MongoDB Atlas)
-Deployment	Railway
-Icons	Lucide React
-
-📁 Project Structure
-csharp
-Copy
-Edit
+```
 Nivasa/
 ├── backend/       # Express API & MongoDB models
 │   ├── models/
@@ -77,121 +73,107 @@ Nivasa/
 │   ├── public/
 │   └── ...
 ├── README.md
-🧑‍💻 Getting Started (Local)
-✅ Prerequisites
-Node.js v18+
+```
 
-MongoDB (local) or MongoDB Atlas
+---
 
-📂 Steps
-1️⃣ Clone the repo
+## 🧑‍💻 Getting Started (Local)
 
-bash
-Copy
-Edit
-git clone https://github.com/your-username/Nivasa.git
-cd Nivasa
-2️⃣ Setup Backend
-
-bash
-Copy
-Edit
+### Backend
+```bash
 cd backend
 npm install
-# Create .env file as per the instructions below
+# Create a .env file as described below
 npm run dev
-3️⃣ Setup Frontend
+```
 
-bash
-Copy
-Edit
+### Frontend
+```bash
 cd ../frontend
 npm install
 npm run dev
-✅ Visit: http://localhost:8080
+```
 
-☁️ Deployment (Railway)
-1️⃣ Push your code to GitHub.
-2️⃣ Go to Railway, create a new project, and link your repo.
-3️⃣ Set environment variables as described below.
-4️⃣ Railway will auto-deploy and give you a public URL.
+✅ Visit: [http://localhost:8080](http://localhost:8080)
 
-🔑 Environment Variables
-Backend (backend/.env):
+---
 
-ini
-Copy
-Edit
+## ☁️ Deployment (Railway)
+
+1. Push your code to GitHub.  
+2. Go to [Railway](https://railway.app), create a new project, and link your repo.  
+3. Set environment variables as described below.  
+4. Railway will auto-deploy and give you a public URL.  
+
+---
+
+## 🔑 Environment Variables
+
+**Backend (`backend/.env`):**
+```ini
 MONGO_URI=your-mongodb-connection-string
 NODE_ENV=production
 PORT=8080
-Frontend (frontend/.env.production):
+```
 
-ini
-Copy
-Edit
+**Frontend (`frontend/.env.production`):**
+```ini
 VITE_API_URL=https://your-railway-url.up.railway.app
-🔌 API Overview
-🔐 Auth
-POST /api/auth/register-apartment
+```
 
-POST /api/auth/signup-admin
+---
 
-POST /api/auth/signup-resident
+## 🔌 API Overview
 
-POST /api/auth/login
+### 🔐 Auth
+- `POST /api/auth/register-apartment`
+- `POST /api/auth/signup-admin`
+- `POST /api/auth/signup-resident`
+- `POST /api/auth/login`
+- `POST /api/auth/validate`
 
-POST /api/auth/validate
+### 🎫 Tickets
+- `POST /api/auth/new-complaint`
+- `GET /api/auth/all-complaint`
+- `PUT /api/auth/update-complaint/:id`
+- `GET /api/auth/stats/:apartmentCode`
 
-🎫 Tickets
-POST /api/auth/new-complaint
+### 💵 Maintenance
+- `POST /api/auth/maintenance/amount`
+- `GET /api/auth/maintenance/amount`
+- `POST /api/auth/maintenance/payment`
+- `GET /api/auth/maintenance/payments`
+- `GET /api/auth/maintenance/my-payments`
+- `POST /api/auth/maintenance/bank-details`
+- `GET /api/auth/maintenance/bank-details`
+- `PATCH /api/auth/maintenance/payment/:id/status`
 
-GET /api/auth/all-complaint
+### 🧑‍🔧 Technicians
+- `GET /api/all-technicians`
+- `POST /api/add-technicians`
+- `PATCH /api/technicians/:id/status`
+- `PUT /api/technicians/:id`
+- `DELETE /api/technicians/:id`
 
-PUT /api/auth/update-complaint/:id
+---
 
-GET /api/auth/stats/:apartmentCode
+## 🛠️ Customization
 
-💵 Maintenance
-POST /api/auth/maintenance/amount
+- **Add ticket categories:** Edit `frontend/src/components/CreateTicketForm.tsx`.  
+- **Modify roles or permissions:** Update the user model and dashboard routing.  
+- **Theme customization:** Adjust `tailwind.config.ts` and `frontend/src/index.css`.  
 
-GET /api/auth/maintenance/amount
+---
 
-POST /api/auth/maintenance/payment
+## 🤝 Contributing
 
-GET /api/auth/maintenance/payments
-
-GET /api/auth/maintenance/my-payments
-
-POST /api/auth/maintenance/bank-details
-
-GET /api/auth/maintenance/bank-details
-
-PATCH /api/auth/maintenance/payment/:id/status
-
-🧑‍🔧 Technicians
-GET /api/all-technicians
-
-POST /api/add-technicians
-
-PATCH /api/technicians/:id/status
-
-PUT /api/technicians/:id
-
-DELETE /api/technicians/:id
-
-🛠️ Customization
-Add ticket categories: Edit frontend/src/components/CreateTicketForm.tsx.
-
-Modify roles or permissions: Update the user model and dashboard routing.
-
-Theme customization: Adjust tailwind.config.ts and frontend/src/index.css.
-
-🤝 Contributing
-Pull requests are welcome!
+Pull requests are welcome!  
 Please open an issue first to discuss major changes.
 
-📄 License
-MIT License
+---
 
-Built with ❤️ for apartment communities.
+## 📄 License
+
+---
+
+**Built with ❤️ for apartment communities.**
