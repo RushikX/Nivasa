@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import axios from 'axios';
+import API_BASE_URL from '@/config/api';
 
 interface User {
   name: string;
@@ -53,7 +54,7 @@ const CreateTicketForm = ({ user, onSuccess }: CreateTicketFormProps) => {
 
     try {
       const response = await axios.post(
-        'http://localhost:5001/api/auth/new-complaint',
+        `${API_BASE_URL}/api/auth/new-complaint`,
         {
           title: formData.title,
           description: formData.description,

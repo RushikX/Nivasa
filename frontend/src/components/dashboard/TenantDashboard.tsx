@@ -14,6 +14,7 @@ import { useEffect } from 'react';
 import axios from 'axios';
 import TechnicianManagement from '@/components/technicians/TechnicianManagement';
 import type { User } from '@/components/profile/ProfilePage';
+import API_BASE_URL from '@/config/api';
 
 interface TenantDashboardProps {
   user: User;
@@ -29,7 +30,7 @@ const TenantDashboard = ({ user }: TenantDashboardProps) => {
     let intervalId: NodeJS.Timeout;
     const fetchStats = async () => {
       try {
-        const res = await axios.get(`http://localhost:5001/api/auth/stats/${user.apartmentCode}`);
+        const res = await axios.get(`${API_BASE_URL}/api/auth/stats/${user.apartmentCode}`);
         setStats(res.data);
       } catch (err) {
         console.error('Failed to fetch ticket stats:', err);

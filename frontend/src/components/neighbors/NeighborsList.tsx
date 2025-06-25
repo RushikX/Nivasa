@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Phone, Mail, Users, Home, User } from 'lucide-react';
 import axios from 'axios';
+import API_BASE_URL from '@/config/api';
 
 interface Neighbor {
     username: string;
@@ -52,7 +53,7 @@ const NeighborsList = ({ apartmentCode, currentUserFlatNumber }: NeighborsListPr
             setError(null);
 
             try {
-                const response = await axios.get(`http://localhost:5001/api/auth/neighbors/${apartmentCode}`);
+                const response = await axios.get(`${API_BASE_URL}/api/auth/neighbors/${apartmentCode}`);
                 setNeighbors(response.data.neighbors || []);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to fetch neighbors');
@@ -69,7 +70,7 @@ const NeighborsList = ({ apartmentCode, currentUserFlatNumber }: NeighborsListPr
         const fetchMaintenanceAmount = async () => {
             if (!apartmentCode) return;
             try {
-                const res = await axios.get(`http://localhost:5001/api/auth/maintenance/amount?apartmentCode=${apartmentCode}`);
+                const res = await axios.get(`${API_BASE_URL}/api/auth/maintenance/amount?apartmentCode=${apartmentCode}`);
                 setMaintenanceAmount(res.data.maintenanceAmount);
             } catch (err) {
                 setMaintenanceAmount(null);

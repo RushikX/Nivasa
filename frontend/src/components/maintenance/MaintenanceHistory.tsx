@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Calendar, DollarSign, Plus, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import axios from 'axios';
+import API_BASE_URL from '@/config/api';
 
 interface MaintenanceRecord {
   id: string;
@@ -52,13 +53,13 @@ const MaintenanceHistory = ({ apartmentCode, isAdmin, userFlatNumber }: Maintena
     const fetchData = async () => {
       try {
         // Fetch maintenance amount
-        const amountRes = await axios.get(`http://localhost:5001/api/auth/maintenance/amount?apartmentCode=${apartmentCode}`);
+        const amountRes = await axios.get(`${API_BASE_URL}/api/auth/maintenance/amount?apartmentCode=${apartmentCode}`);
         setMaintenanceAmount(amountRes.data.maintenanceAmount);
         // Fetch payment requests
-        const paymentsRes = await axios.get(`http://localhost:5001/api/auth/maintenance/payments?apartmentCode=${apartmentCode}`);
+        const paymentsRes = await axios.get(`${API_BASE_URL}/api/auth/maintenance/payments?apartmentCode=${apartmentCode}`);
         setPaymentRequests(paymentsRes.data.payments);
         // Fetch bank details
-        const bankRes = await axios.get(`http://localhost:5001/api/auth/maintenance/bank-details?apartmentCode=${apartmentCode}`);
+        const bankRes = await axios.get(`${API_BASE_URL}/api/auth/maintenance/bank-details?apartmentCode=${apartmentCode}`);
         setBankDetails(bankRes.data.bankDetails);
         setIsLoading(false);
       } catch (err) {
@@ -101,7 +102,7 @@ const MaintenanceHistory = ({ apartmentCode, isAdmin, userFlatNumber }: Maintena
 
   const handleStatusChange = async (paymentId: string, newStatus: 'approved' | 'rejected') => {
     try {
-      await axios.patch(`http://localhost:5001/api/auth/maintenance/payment/${paymentId}/status`, {
+      await axios.patch(`${API_BASE_URL}/api/auth/maintenance/payment/${paymentId}/status`, {
         status: newStatus,
       });
       toast({
@@ -109,7 +110,7 @@ const MaintenanceHistory = ({ apartmentCode, isAdmin, userFlatNumber }: Maintena
         description: `Request ${newStatus} successfully`
       });
       // Refetch payment requests to update the UI
-      const paymentsRes = await axios.get(`http://localhost:5001/api/auth/maintenance/payments?apartmentCode=${apartmentCode}`);
+      const paymentsRes = await axios.get(`${API_BASE_URL}/api/auth/maintenance/payments?apartmentCode=${apartmentCode}`);
       setPaymentRequests(paymentsRes.data.payments);
     } catch (err: any) {
       toast({
@@ -148,7 +149,7 @@ const MaintenanceHistory = ({ apartmentCode, isAdmin, userFlatNumber }: Maintena
       return;
     }
     try {
-      await axios.post('http://localhost:5001/api/auth/maintenance/payment', {
+      await axios.post(`${API_BASE_URL}/api/auth/maintenance/payment`, {
         apartmentCode,
         flatNumber: userFlatNumber,
         transactionId: upiTransactionId
@@ -157,7 +158,7 @@ const MaintenanceHistory = ({ apartmentCode, isAdmin, userFlatNumber }: Maintena
       setSelectedMonths([]);
       setUpiTransactionId('');
       // Refresh payment requests
-      const paymentsRes = await axios.get(`http://localhost:5001/api/auth/maintenance/payments?apartmentCode=${apartmentCode}`);
+      const paymentsRes = await axios.get(`${API_BASE_URL}/api/auth/maintenance/payments?apartmentCode=${apartmentCode}`);
       setPaymentRequests(paymentsRes.data.payments);
     } catch (err) {
       toast({ title: 'Error', description: 'Failed to submit payment request', variant: 'destructive' });
@@ -167,7 +168,7 @@ const MaintenanceHistory = ({ apartmentCode, isAdmin, userFlatNumber }: Maintena
   const handleAmountUpdate = async () => {
     if (!editAmount) return;
     try {
-      const res = await axios.post('http://localhost:5001/api/auth/maintenance/amount', {
+      const res = await axios.post(`${API_BASE_URL}/api/auth/maintenance/amount`, {
         apartmentCode,
         amount: parseFloat(editAmount)
       });
@@ -325,7 +326,7 @@ const MaintenanceHistory = ({ apartmentCode, isAdmin, userFlatNumber }: Maintena
                 e.preventDefault();
                 setIsLoading(true);
                 try {
-                  await axios.post('http://localhost:5001/api/auth/maintenance/bank-details', {
+                  await axios.post(`${API_BASE_URL}/api/auth/maintenance/bank-details`, {
                     apartmentCode,
                     ...bankDetails
                   });

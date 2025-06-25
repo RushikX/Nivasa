@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Clock, User as UserIcon, Wrench, CheckCircle, AlertCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import axios from 'axios';
+import API_BASE_URL from '@/config/api';
 
 
 interface User {
@@ -42,7 +43,7 @@ const TicketManagement = ({ user }: TicketManagementProps) => {
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const res = await axios.get(`http://localhost:5001/api/auth/all-complaint?apartmentCode=${user.apartmentCode}`);
+        const res = await axios.get(`${API_BASE_URL}/api/auth/all-complaint?apartmentCode=${user.apartmentCode}`);
         const data = res.data.complaints.map((complaint: any) => ({
           id: complaint._id,
           title: complaint.title,
@@ -77,7 +78,7 @@ const TicketManagement = ({ user }: TicketManagementProps) => {
       const backendStatus = newStatus === 'cleared' ? 'resolved' :
         newStatus === 'assigned' ? 'in-progress' : 'open';
 
-      await axios.put(`http://localhost:5001/api/auth/update-complaint/${ticketId}`, {
+      await axios.put(`${API_BASE_URL}/api/auth/update-complaint/${ticketId}`, {
         status: backendStatus,
         assignedTo
       });

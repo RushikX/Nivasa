@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Clock, Wrench, CheckCircle, AlertCircle, MessageSquare, Filter } from 'lucide-react';
 import axios from 'axios';
+import API_BASE_URL from '@/config/api';
 
 interface User {
   apartmentCode: any;
@@ -38,7 +39,7 @@ const TenantTicketList = ({ user }: TenantTicketListProps) => {
     let intervalId: NodeJS.Timeout;
     const fetchTickets = async () => {
       try {
-        const res = await axios.get(`http://localhost:5001/api/auth/all-complaint?apartmentCode=${user.apartmentCode}`);
+        const res = await axios.get(`${API_BASE_URL}/api/auth/all-complaint?apartmentCode=${user.apartmentCode}`);
         const data = res.data.complaints.map((complaint: any) => ({
           id: complaint._id,
           title: complaint.title,

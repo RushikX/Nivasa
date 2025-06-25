@@ -19,6 +19,7 @@ import axios from 'axios';
 import { Input } from '@/components/ui/input';
 import TechnicianManagement from '@/components/technicians/TechnicianManagement';
 import type { User } from "@/components/profile/ProfilePage";
+import API_BASE_URL from '@/config/api';
 
 interface AdminDashboardProps {
   user: User;
@@ -44,7 +45,7 @@ const AdminDashboard = ({ user }: AdminDashboardProps) => {
     let intervalId: NodeJS.Timeout;
     const fetchStats = async () => {
       try {
-        const res = await axios.get(`http://localhost:5001/api/auth/stats/${user.apartmentCode}`);
+        const res = await axios.get(`${API_BASE_URL}/api/auth/stats/${user.apartmentCode}`);
         setStats(res.data);
       } catch (err) {
         console.error('Failed to fetch ticket stats:', err);
@@ -59,7 +60,7 @@ const AdminDashboard = ({ user }: AdminDashboardProps) => {
     // Fetch bank details
     const fetchBankDetails = async () => {
       try {
-        const res = await axios.get(`http://localhost:5001/api/auth/maintenance/bank-details?apartmentCode=${user.apartmentCode}`);
+        const res = await axios.get(`${API_BASE_URL}/api/auth/maintenance/bank-details?apartmentCode=${user.apartmentCode}`);
         setBankDetails(res.data.bankDetails);
         setEditBankDetails(res.data.bankDetails || editBankDetails);
       } catch (err) {
@@ -103,7 +104,7 @@ const AdminDashboard = ({ user }: AdminDashboardProps) => {
     e.preventDefault();
     setBankLoading(true);
     try {
-      await axios.post('http://localhost:5001/api/auth/maintenance/bank-details', {
+      await axios.post(`${API_BASE_URL}/api/auth/maintenance/bank-details`, {
         apartmentCode: user.apartmentCode,
         ...editBankDetails
       });

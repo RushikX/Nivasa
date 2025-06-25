@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { toast } from '@/hooks/use-toast';
 import axios from 'axios';
+import API_BASE_URL from '@/config/api';
 
 
 interface TechnicianFormProps {
@@ -74,7 +75,7 @@ const TechnicianForm = ({ open, onClose, onSubmit }: TechnicianFormProps) => {
 
         try {
             const response = await axios.post(
-                'http://localhost:5001/api/add-technicians', // Updated endpoint
+                `${API_BASE_URL}/api/add-technicians`,
                 formData,
                 {
                     headers: {
