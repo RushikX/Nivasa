@@ -8,18 +8,48 @@ const app = express();
 const PORT = process.env.PORT || 5001; // Vercel will set its own PORT
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:8080', 'http://localhost:3000', 'https://*.railway.app', 'https://*.vercel.app'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch((err) => console.error('❌ MongoDB connection error:', err));
+  .then(() => {
+    console.log('✅ MongoDB connected successfully');
+    console.log('🔗 Database URL:', process.env.MONGO_URI ? 'Set' : 'Not set');
+  })
+  .catch((err) => {
+    console.error('❌ MongoDB connection error:', err);
+    console.error('🔗 Database URL:', process.env.MONGO_URI ? 'Set' : 'Not set');
+  });
+
+// Add connection status check
+mongoose.connection.on('error', (err) => {
+  console.error('❌ MongoDB connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('⚠️ MongoDB disconnected');
+});
 
 // API routes
 const authRoutes = require('./routes/auth');
 const technicianRoutes = require('./routes/technicianRoutes');
 // const complaintRoutes = require('./routes/complaint'); // if you have this
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api', technicianRoutes);
