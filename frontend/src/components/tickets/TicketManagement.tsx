@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Clock, User, Wrench, CheckCircle, AlertCircle } from 'lucide-react';
+import { Clock, User as UserIcon, Wrench, CheckCircle, AlertCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import axios from 'axios';
 
@@ -108,7 +108,7 @@ const TicketManagement = ({ user }: TicketManagementProps) => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'open': return <AlertCircle className="h-4 w-4" />;
-      case 'assigned': return <User className="h-4 w-4" />;
+      case 'assigned': return <UserIcon className="h-4 w-4" />;
       case 'cleared': return <CheckCircle className="h-4 w-4" />;
       default: return <Clock className="h-4 w-4" />;
     }
@@ -172,7 +172,7 @@ const TicketManagement = ({ user }: TicketManagementProps) => {
             </span>
             {ticket.assignedTo && (
               <span className="flex items-center">
-                <User className="h-4 w-4 mr-1" />
+                <UserIcon className="h-4 w-4 mr-1" />
                 {ticket.assignedTo}
               </span>
             )}

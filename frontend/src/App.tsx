@@ -27,8 +27,8 @@ const App = () => (
 
           <Route path="/register-apartment" element={<RegisterApartment />} />
           <Route path="/admin-registration" element={<AdminRegistration />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard user={undefined} />} />
-          <Route path="/tenant-dashboard" element={<TenantDashboard user={undefined} />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard user={{} as any} />} />
+          <Route path="/tenant-dashboard" element={<TenantDashboard user={{} as any} />} />
           <Route
             path="/resident-registration"
             element={<ResidentRegistration />}

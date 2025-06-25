@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   Building2, Ticket, Users, Wrench, LogOut, Menu, X,
-  DollarSign, User, Plus
+  DollarSign, User as UserIcon, Plus
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {

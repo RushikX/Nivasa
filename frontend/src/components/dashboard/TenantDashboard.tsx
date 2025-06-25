@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building2, Plus, Ticket, LogOut, Menu, X, Users, DollarSign, User, Wrench } from 'lucide-react';
+import { Building2, Plus, Ticket, LogOut, Menu, X, Users, DollarSign, User as UserIcon, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

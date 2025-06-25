@@ -1,4 +1,4 @@
-import { User, Phone, Building, Home } from 'lucide-react';
+import { User as UserIcon, Phone, Building, Home } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export interface User {
@@ -20,7 +20,7 @@ const ProfilePage = ({ user }: ProfilePageProps) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-2">
-        <User className="h-6 w-6 text-blue-600" />
+        <UserIcon className="h-6 w-6 text-blue-600" />
         <h2 className="text-2xl font-bold">My Profile</h2>
       </div>
 
@@ -36,7 +36,7 @@ const ProfilePage = ({ user }: ProfilePageProps) => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-            <User className="h-5 w-5 text-blue-600" />
+            <UserIcon className="h-5 w-5 text-blue-600" />
             <div>
               <p className="text-sm text-gray-600">User Name</p>
               <p className="font-medium">{user.username || 'Not set'}</p>
