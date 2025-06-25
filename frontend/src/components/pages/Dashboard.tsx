@@ -32,7 +32,7 @@ const Dashboard = () => {
     const validateUser = async () => {
       try {
         const res = await axios.post(
-          "http://localhost:5001/api/auth/validate",
+          "https://nivasa-production-7aa9.up.railway.app/api/auth/validate",
           {
             phoneNumber: phone,
           }

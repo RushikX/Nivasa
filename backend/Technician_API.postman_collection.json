@@ -210,7 +210,7 @@
     "variable": [
         {
             "key": "base_url",
-            "value": "http://localhost:5001",
+            "value": "https://nivasa-production-7aa9.up.railway.app",
             "type": "string"
         },
         {

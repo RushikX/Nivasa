@@ -106,7 +106,7 @@ Create a new collection called "Technician API"
 
 ### 2. Environment Variables
 Set up environment variables in Postman:
-- `base_url`: `http://localhost:5001`
+- `base_url`: `https://nivasa-production-7aa9.up.railway.app`
 
 ### 3. Test Requests
 
