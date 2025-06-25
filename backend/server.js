@@ -58,8 +58,12 @@ app.use('/api', technicianRoutes);
 // ✅ Serve static files for frontend (e.g. React build) if present
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ✅ Fallback to index.html for client-side routing
-app.get('*', (req, res) => {
+// ✅ Fallback to index.html for client-side routing (only for non-API routes)
+app.get('*', (req, res, next) => {
+  // Skip API routes
+  if (req.path.startsWith('/api/')) {
+    return next();
+  }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
