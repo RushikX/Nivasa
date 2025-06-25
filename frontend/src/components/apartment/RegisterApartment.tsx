@@ -6,7 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
+
+// Get the current domain for API calls
+const API_BASE_URL = window.location.origin;
 
 const RegisterApartment = () => {
   const [apartmentName, setApartmentName] = useState('');
@@ -32,7 +35,7 @@ const RegisterApartment = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:5001/api/auth/register-apartment', {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/register-apartment`, {
         name: apartmentName,
       });
 
@@ -45,6 +48,7 @@ const RegisterApartment = () => {
 
       navigate(`/admin-registration?code=${apartmentCode}`);
     } catch (error: any) {
+      console.error('Registration error:', error);
       toast({
         title: 'Registration failed',
         description: error.response?.data?.error || 'Server error',

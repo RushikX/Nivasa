@@ -14,6 +14,9 @@ import {
 import { toast } from "@/hooks/use-toast";
 import axios from "axios"; // Import axios
 
+// Get the current domain for API calls
+const API_BASE_URL = window.location.origin;
+
 const AdminRegistration = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -82,7 +85,7 @@ const AdminRegistration = () => {
     }
     setIsLoading(true);
     try {
-      await axios.post("http://localhost:5001/api/auth/signup-admin", {
+      await axios.post(`${API_BASE_URL}/api/auth/signup-admin`, {
         username: formData.username,
         phoneNumber: formData.phone,
         flatNumber: formData.flatNumber,

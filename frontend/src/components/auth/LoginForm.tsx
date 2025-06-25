@@ -19,6 +19,9 @@ interface LoginFormProps {
   onSwitchToSignup: () => void;
 }
 
+// Get the current domain for API calls
+const API_BASE_URL = window.location.origin;
+
 const LoginForm = ({ onBack, onSwitchToSignup }: LoginFormProps) => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -31,7 +34,7 @@ const LoginForm = ({ onBack, onSwitchToSignup }: LoginFormProps) => {
     setIsLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5001/api/auth/login", {
+      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, {
         phoneNumber: phone,
         password,
       });
