@@ -8,6 +8,8 @@ import {
   CheckCircle,
   ArrowRight,
   Plus,
+  Github,
+  Linkedin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,6 +47,34 @@ const Index = () => {
     },
   ];
 
+  const contributors = [
+    {
+      name: "Viriyala Dinesh",
+      linkedin: "https://www.linkedin.com/in/dinesh-viriyala-770912277/",
+      github: "https://github.com/dineshviriyala",
+    },
+    {
+      name: "Bhargav Padala",
+      linkedin: "https://www.linkedin.com/in/bhargav-padala-b636ab24a/",
+      github: "https://github.com/Bharyy",
+    },
+    {
+      name: "Yerra Rushik kumar",
+      linkedin: "https://www.linkedin.com/in/rushik-yerra-20372821b/", // Replace with actual
+      github: "https://github.com/RushikX",
+    },
+    {
+      name: "Karri Sai Chetan",
+      linkedin: "https://www.linkedin.com/in/saichetan117/ ", // Replace with actual
+      github: "https://github.com/SaiChetan338",
+    },
+    {
+      name: "Penupala Nitin",
+      linkedin: "https://github.com/Nitin-Penupala", // Replace with actual
+      github: "https://www.linkedin.com/in/nitin-penupala/",
+    },
+  ];
+
   if (showLogin) {
     return (
       <LoginForm
@@ -70,10 +100,7 @@ const Index = () => {
                 </span>
               </span>
             </div>
-            <div className="flex space-x-4">
-
-
-            </div>
+            <div className="flex space-x-4"></div>
           </div>
         </div>
       </nav>
@@ -111,7 +138,7 @@ const Index = () => {
               onClick={() => setShowLogin(true)}
               className="text-lg px-8 py-3"
             >
-              <Link to="/login-form">Login</Link>
+              Login
             </Button>
           </div>
         </div>
@@ -169,16 +196,36 @@ const Index = () => {
       {/* Site made by Section */}
       <section className="py-8 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">Site made by:</h3>
-          <ul className="inline-block text-gray-600 text-lg space-y-1">
-            <li>Viriyala Dinesh</li>
-            <li>Bhargav Padala</li>
-            <li>Rushik</li>
-            <li>Chetan</li>
-            <li>Nithin</li>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">
+            Site made by:
+          </h3>
+          <ul className="inline-block text-gray-600 text-lg space-y-2">
+            {contributors.map((person, idx) => (
+              <li
+                key={idx}
+                className="flex items-center justify-center space-x-3"
+              >
+                <a
+                  href={person.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Linkedin className="w-5 h-5 hover:text-blue-600" />
+                </a>
+                <a
+                  href={person.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Github className="w-5 h-5 hover:text-gray-800" />
+                </a>
+                <span>{person.name}</span>
+              </li>
+            ))}
           </ul>
         </div>
       </section>
+
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
@@ -188,7 +235,7 @@ const Index = () => {
             <span className="text-2xl font-bold">Nivasa</span>
           </div>
           <p className="text-center text-gray-400">
-            © 2024 Nivasa. All rights reserved. Simplifying apartment
+            Â© 2024 Nivasa. All rights reserved. Simplifying apartment
             management one property at a time.
           </p>
         </div>

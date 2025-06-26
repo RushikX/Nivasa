@@ -30,6 +30,11 @@ const technicianSchema = new mongoose.Schema({
         required: true,
         enum: ['available', 'busy', 'offline'],
         default: 'available'
+    },
+    apartmentCode: {
+        type: String,
+        required: true,
+        trim: true
     }
 }, {
     timestamps: true

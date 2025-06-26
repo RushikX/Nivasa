@@ -11,7 +11,6 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { toast } from '@/components/ui/use-toast';
-import API_BASE_URL from '@/config/api';
 
 interface Technician {
   id: string;
@@ -20,19 +19,26 @@ interface Technician {
   phone: string;
   specialty: string;
   status: 'available' | 'busy' | 'offline';
+  apartmentCode: string;
 }
 
-const TechnicianManagement = () => {
+interface TechnicianManagementProps {
+  apartmentCode: string;
+}
+
+const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [formOpen, setFormOpen] = useState(false);
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch all technicians on mount
+  const API_BASE_URL = 'http://localhost:5001/api'; // Updated backend URL
+
+  // Fetch all technicians for this apartment on mount
   useEffect(() => {
     const fetchTechnicians = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/all-technicians`);
+        const response = await fetch(`${API_BASE_URL}/all-technicians?apartmentCode=${apartmentCode}`);
         if (!response.ok) throw new Error('Failed to fetch technicians');
         const data = await response.json();
         // Map _id to id for consistency with frontend interface
@@ -42,7 +48,8 @@ const TechnicianManagement = () => {
           email: tech.email,
           phone: tech.phone,
           specialty: tech.specialty,
-          status: tech.status
+          status: tech.status,
+          apartmentCode: tech.apartmentCode
         }));
         setTechnicians(mappedTechnicians);
       } catch (error) {
@@ -56,8 +63,10 @@ const TechnicianManagement = () => {
       }
     };
 
-    fetchTechnicians();
-  }, []);
+    if (apartmentCode) {
+      fetchTechnicians();
+    }
+  }, [apartmentCode]);
 
   const filteredTechnicians = technicians.filter(tech =>
     tech.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -92,7 +101,7 @@ const TechnicianManagement = () => {
   }) => {
     try {
       // Add the new technician to the local state
-      setTechnicians([...technicians, technicianData]);
+      setTechnicians([...technicians, { ...technicianData, apartmentCode }]);
       setFormOpen(false);
       toast({
         title: "Technician Added",
@@ -111,7 +120,7 @@ const TechnicianManagement = () => {
     try {
       const token = localStorage.getItem('authToken'); // Replace with your auth token retrieval logic
       const techToDelete = technicians.find(tech => tech.id === id);
-      const response = await fetch(`${API_BASE_URL}/technicians/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/technicians/${id}?apartmentCode=${apartmentCode}`, {
         method: 'DELETE',
         headers: {
           ...(token && { Authorization: `Bearer ${token}` })
@@ -142,7 +151,7 @@ const TechnicianManagement = () => {
           'Content-Type': 'application/json',
           ...(token && { Authorization: `Bearer ${token}` })
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus, apartmentCode })
       });
 
       if (!response.ok) throw new Error('Failed to update status');
@@ -178,6 +187,7 @@ const TechnicianManagement = () => {
         open={formOpen}
         onClose={() => setFormOpen(false)}
         onSubmit={handleAddTechnician}
+        apartmentCode={apartmentCode}
       />
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

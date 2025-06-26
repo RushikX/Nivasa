@@ -2,10 +2,16 @@ const express = require('express');
 const router = express.Router();
 const Technician = require('../models/Technician');
 
-// GET all technicians
+// GET all technicians for a specific apartment
 router.get('/all-technicians', async (req, res) => {
     try {
-        const technicians = await Technician.find().sort({ createdAt: -1 });
+        const { apartmentCode } = req.query;
+        
+        if (!apartmentCode) {
+            return res.status(400).json({ error: 'Apartment code is required' });
+        }
+
+        const technicians = await Technician.find({ apartmentCode }).sort({ createdAt: -1 });
         res.status(200).json(technicians);
     } catch (error) {
         console.error('Error fetching technicians:', error);
@@ -13,10 +19,20 @@ router.get('/all-technicians', async (req, res) => {
     }
 });
 
-// GET technician by ID
+// GET technician by ID (apartment-specific)
 router.get('/technicians/:id', async (req, res) => {
     try {
-        const technician = await Technician.findById(req.params.id);
+        const { apartmentCode } = req.query;
+        
+        if (!apartmentCode) {
+            return res.status(400).json({ error: 'Apartment code is required' });
+        }
+
+        const technician = await Technician.findOne({ 
+            _id: req.params.id, 
+            apartmentCode 
+        });
+        
         if (!technician) {
             return res.status(404).json({ error: 'Technician not found' });
         }
@@ -27,24 +43,24 @@ router.get('/technicians/:id', async (req, res) => {
     }
 });
 
-// POST add new technician
+// POST add new technician (apartment-specific)
 router.post('/add-technicians', async (req, res) => {
     try {
-        const { name, email, phone, specialty, status } = req.body;
+        const { name, email, phone, specialty, status, apartmentCode } = req.body;
 
-        console.log('Received technician data:', { name, email, phone, specialty, status });
+        console.log('Received technician data:', { name, email, phone, specialty, status, apartmentCode });
 
         // Validation
-        if (!name || !email || !phone || !specialty) {
+        if (!name || !email || !phone || !specialty || !apartmentCode) {
             console.log('Validation failed: Missing required fields');
-            return res.status(400).json({ error: 'Name, email, phone, and specialty are required' });
+            return res.status(400).json({ error: 'Name, email, phone, specialty, and apartment code are required' });
         }
 
-        // Check if email already exists
-        const existingTechnician = await Technician.findOne({ email });
+        // Check if email already exists for this apartment
+        const existingTechnician = await Technician.findOne({ email, apartmentCode });
         if (existingTechnician) {
-            console.log('Validation failed: Email already exists');
-            return res.status(400).json({ error: 'Technician with this email already exists' });
+            console.log('Validation failed: Email already exists for this apartment');
+            return res.status(400).json({ error: 'Technician with this email already exists in this apartment' });
         }
 
         // Create new technician
@@ -53,7 +69,8 @@ router.post('/add-technicians', async (req, res) => {
             email,
             phone,
             specialty,
-            status: status || 'available'
+            status: status || 'available',
+            apartmentCode
         });
 
         console.log('Saving technician to database...');
@@ -71,17 +88,21 @@ router.post('/add-technicians', async (req, res) => {
     }
 });
 
-// PATCH update technician status
+// PATCH update technician status (apartment-specific)
 router.patch('/technicians/:id/status', async (req, res) => {
     try {
-        const { status } = req.body;
+        const { status, apartmentCode } = req.body;
 
         if (!status || !['available', 'busy', 'offline'].includes(status)) {
             return res.status(400).json({ error: 'Valid status is required (available, busy, offline)' });
         }
 
-        const updatedTechnician = await Technician.findByIdAndUpdate(
-            req.params.id,
+        if (!apartmentCode) {
+            return res.status(400).json({ error: 'Apartment code is required' });
+        }
+
+        const updatedTechnician = await Technician.findOneAndUpdate(
+            { _id: req.params.id, apartmentCode },
             { status },
             { new: true, runValidators: true }
         );
@@ -97,24 +118,29 @@ router.patch('/technicians/:id/status', async (req, res) => {
     }
 });
 
-// PUT update technician
+// PUT update technician (apartment-specific)
 router.put('/technicians/:id', async (req, res) => {
     try {
-        const { name, email, phone, specialty, status } = req.body;
+        const { name, email, phone, specialty, status, apartmentCode } = req.body;
 
-        // Check if email already exists for different technician
+        if (!apartmentCode) {
+            return res.status(400).json({ error: 'Apartment code is required' });
+        }
+
+        // Check if email already exists for different technician in same apartment
         if (email) {
             const existingTechnician = await Technician.findOne({
                 email,
+                apartmentCode,
                 _id: { $ne: req.params.id }
             });
             if (existingTechnician) {
-                return res.status(400).json({ error: 'Technician with this email already exists' });
+                return res.status(400).json({ error: 'Technician with this email already exists in this apartment' });
             }
         }
 
-        const updatedTechnician = await Technician.findByIdAndUpdate(
-            req.params.id,
+        const updatedTechnician = await Technician.findOneAndUpdate(
+            { _id: req.params.id, apartmentCode },
             { name, email, phone, specialty, status },
             { new: true, runValidators: true }
         );
@@ -133,10 +159,19 @@ router.put('/technicians/:id', async (req, res) => {
     }
 });
 
-// DELETE technician
+// DELETE technician (apartment-specific)
 router.delete('/technicians/:id', async (req, res) => {
     try {
-        const technician = await Technician.findByIdAndDelete(req.params.id);
+        const { apartmentCode } = req.query;
+        
+        if (!apartmentCode) {
+            return res.status(400).json({ error: 'Apartment code is required' });
+        }
+
+        const technician = await Technician.findOneAndDelete({ 
+            _id: req.params.id, 
+            apartmentCode 
+        });
 
         if (!technician) {
             return res.status(404).json({ error: 'Technician not found' });
@@ -152,12 +187,19 @@ router.delete('/technicians/:id', async (req, res) => {
     }
 });
 
-// GET technicians by specialty
+// GET technicians by specialty (apartment-specific)
 router.get('/technicians/specialty/:specialty', async (req, res) => {
     try {
         const { specialty } = req.params;
+        const { apartmentCode } = req.query;
+        
+        if (!apartmentCode) {
+            return res.status(400).json({ error: 'Apartment code is required' });
+        }
+
         const technicians = await Technician.find({
-            specialty: { $regex: specialty, $options: 'i' }
+            specialty: { $regex: specialty, $options: 'i' },
+            apartmentCode
         }).sort({ createdAt: -1 });
 
         res.status(200).json(technicians);
@@ -167,10 +209,19 @@ router.get('/technicians/specialty/:specialty', async (req, res) => {
     }
 });
 
-// GET available technicians
+// GET available technicians (apartment-specific)
 router.get('/technicians/status/available', async (req, res) => {
     try {
-        const technicians = await Technician.find({ status: 'available' }).sort({ createdAt: -1 });
+        const { apartmentCode } = req.query;
+        
+        if (!apartmentCode) {
+            return res.status(400).json({ error: 'Apartment code is required' });
+        }
+
+        const technicians = await Technician.find({ 
+            status: 'available', 
+            apartmentCode 
+        }).sort({ createdAt: -1 });
         res.status(200).json(technicians);
     } catch (error) {
         console.error('Error fetching available technicians:', error);
