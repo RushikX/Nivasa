@@ -1,2 +1,5 @@
 [phases.build]
 cmds = ["npm ci --omit=dev && npm run build"]
+
+[phases.setup]
+nixpkgs = "nixpkgs-unstable"
