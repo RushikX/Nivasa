@@ -1,16 +1,16 @@
 FROM node:18-alpine
 WORKDIR /app
 
-# Copy all files
 COPY . .
 
-# Build backend first if needed
-RUN cd backend && npm ci --omit=dev && npm run build
-
-# Build frontend
+# 1️⃣ Build frontend
 RUN cd frontend && npm ci && npm run build
 
-# Serve built frontend
+# 2️⃣ Build backend
+RUN cd backend && npm ci --omit=dev && npm run build
+
+# 3️⃣ Install serve globally
 RUN npm install -g serve
 
-CMD ["serve", "-s", "frontend/dist", "--no-clipboard"]
+# 4️⃣ Serve the frontend dist
+CMD ["serve", "-s", "frontend/dist"]
