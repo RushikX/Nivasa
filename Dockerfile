@@ -7,7 +7,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install all dependencies (no cache mount used here)
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
+
 
 # Copy the rest of the app
 COPY . .
