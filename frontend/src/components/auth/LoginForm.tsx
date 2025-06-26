@@ -31,7 +31,7 @@ const LoginForm = ({ onBack, onSwitchToSignup }: LoginFormProps) => {
     setIsLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5001/api/auth/login", {
+      const res = await axios.post("https://nivasa-production-7aa9.up.railway.app/api/auth/login", {
         phoneNumber: phone,
         password,
       });
