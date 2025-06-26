@@ -16,23 +16,6 @@ const RegisterApartment = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Test API connection
-  const testAPI = async () => {
-    try {
-      console.log('🧪 Testing API connection to:', `${API_BASE_URL}/api/health`);
-      const response = await axios.get(`${API_BASE_URL}/api/health`);
-      console.log('✅ API test successful:', response.data);
-      toast({ title: 'API Test', description: 'Connection successful!' });
-    } catch (error: any) {
-      console.error('❌ API test failed:', error);
-      toast({ 
-        title: 'API Test Failed', 
-        description: error.message,
-        variant: 'destructive' 
-      });
-    }
-  };
-
   const generateApartmentCode = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let result = '';
@@ -52,14 +35,9 @@ const RegisterApartment = () => {
 
     setIsLoading(true);
     try {
-      console.log('🚀 Making API call to:', `${API_BASE_URL}/api/auth/register-apartment`);
-      console.log('📝 Request data:', { name: apartmentName });
-      
       const response = await axios.post(`${API_BASE_URL}/api/auth/register-apartment`, {
         name: apartmentName,
       });
-
-      console.log('✅ API response:', response.data);
 
       const { apartmentCode } = response.data;
 
@@ -70,9 +48,6 @@ const RegisterApartment = () => {
 
       navigate(`/admin-registration?code=${apartmentCode}`);
     } catch (error: any) {
-      console.error('❌ Registration error:', error);
-      console.error('❌ Error response:', error.response?.data);
-      console.error('❌ Error status:', error.response?.status);
       toast({
         title: 'Registration failed',
         description: error.response?.data?.error || 'Server error',
@@ -82,7 +57,6 @@ const RegisterApartment = () => {
       setIsLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4">
@@ -97,9 +71,7 @@ const RegisterApartment = () => {
           </Button>
           <div className="flex items-center justify-center space-x-2 mb-4">
             <Building2 className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">
-              Nivasa
-            </span>
+            <span className="text-2xl font-bold text-gray-900">Nivasa</span>
           </div>
           <CardTitle className="text-2xl">Register New Apartment</CardTitle>
           <CardDescription>
@@ -124,16 +96,6 @@ const RegisterApartment = () => {
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Creating Apartment...' : 'Generate Code & Continue'}
-            </Button>
-
-            {/* Debug button - remove after testing */}
-            <Button 
-              type="button" 
-              variant="outline" 
-              className="w-full" 
-              onClick={testAPI}
-            >
-              Test API Connection
             </Button>
           </form>
 

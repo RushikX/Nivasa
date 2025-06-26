@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { toast } from '@/components/ui/use-toast';
+import API_BASE_URL from '@/config/api';
 
 interface Technician {
   id: string;
@@ -31,8 +32,6 @@ const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
   const [formOpen, setFormOpen] = useState(false);
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const API_BASE_URL = 'http://localhost:5001/api'; // Updated backend URL
 
   // Fetch all technicians for this apartment on mount
   useEffect(() => {

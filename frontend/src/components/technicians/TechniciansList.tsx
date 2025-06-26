@@ -436,7 +436,7 @@ const TechniciansList = ({ apartmentCode, isAdmin = false }: TechniciansListProp
   useEffect(() => {
     const fetchTechnicians = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/api/all-technicians?apartmentCode=${apartmentCode}`);
+        const response = await fetch(`${API_BASE_URL}/api/all-technicians?apartmentCode=${apartmentCode}`);
         if (!response.ok) throw new Error('Failed to fetch technicians');
         const data = await response.json();
         
