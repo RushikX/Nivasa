@@ -6,9 +6,10 @@ const apartmentSchema = new mongoose.Schema({
   maintenanceAmount: { type: Number, default: 0 },
   bankDetails: {
     accountNumber: { type: String },
-    accountHolderName: { type: String },
+    accountHolder: { type: String },
     bankName: { type: String },
     ifscCode: { type: String },
+    branch: { type: String },
     upiId: { type: String }
   }
 }, { timestamps: true });
