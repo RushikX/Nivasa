@@ -22,7 +22,11 @@ interface Technician {
   status: 'available' | 'busy' | 'offline';
 }
 
-const TechnicianManagement = () => {
+interface TechnicianManagementProps {
+  apartmentCode: string;
+}
+
+const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [formOpen, setFormOpen] = useState(false);
   const [technicians, setTechnicians] = useState<Technician[]>([]);
@@ -32,9 +36,19 @@ const TechnicianManagement = () => {
   useEffect(() => {
     const fetchTechnicians = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/all-technicians`);
-        if (!response.ok) throw new Error('Failed to fetch technicians');
+        console.log('🔍 Fetching technicians for apartmentCode:', apartmentCode);
+        const response = await fetch(`${API_BASE_URL}/api/all-technicians?apartmentCode=${apartmentCode}`);
+        console.log('📡 Response status:', response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ Response not ok:', response.status, errorText);
+          throw new Error(`Failed to fetch technicians: ${response.status} ${errorText}`);
+        }
+        
         const data = await response.json();
+        console.log('📦 Received data:', data);
+        
         // Map _id to id for consistency with frontend interface
         const mappedTechnicians = data.map((tech: any) => ({
           id: tech._id,
@@ -44,8 +58,11 @@ const TechnicianManagement = () => {
           specialty: tech.specialty,
           status: tech.status
         }));
+        
+        console.log('✅ Mapped technicians:', mappedTechnicians);
         setTechnicians(mappedTechnicians);
       } catch (error) {
+        console.error('Error fetching technicians:', error);
         toast({
           title: "Error",
           description: "Failed to load technicians.",
@@ -57,7 +74,7 @@ const TechnicianManagement = () => {
     };
 
     fetchTechnicians();
-  }, []);
+  }, [apartmentCode]);
 
   const filteredTechnicians = technicians.filter(tech =>
     tech.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -91,8 +108,26 @@ const TechnicianManagement = () => {
     status: 'available' | 'busy' | 'offline';
   }) => {
     try {
-      // Add the new technician to the local state
-      setTechnicians([...technicians, technicianData]);
+      const token = localStorage.getItem('authToken');
+      // Make actual API call to add technician
+      const response = await fetch(`${API_BASE_URL}/api/add-technicians`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { Authorization: `Bearer ${token}` })
+        },
+        body: JSON.stringify({ ...technicianData, apartmentCode })
+      });
+
+      if (!response.ok) throw new Error('Failed to add technician');
+      
+      const newTechnician = await response.json();
+      
+      // Add the new technician to the local state with the correct id
+      setTechnicians([...technicians, {
+        ...technicianData,
+        id: newTechnician._id
+      }]);
       setFormOpen(false);
       toast({
         title: "Technician Added",
@@ -109,9 +144,9 @@ const TechnicianManagement = () => {
 
   const handleDeleteTechnician = async (id: string) => {
     try {
-      const token = localStorage.getItem('authToken'); // Replace with your auth token retrieval logic
+      const token = localStorage.getItem('authToken');
       const techToDelete = technicians.find(tech => tech.id === id);
-      const response = await fetch(`${API_BASE_URL}/technicians/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/technicians/${id}?apartmentCode=${apartmentCode}`, {
         method: 'DELETE',
         headers: {
           ...(token && { Authorization: `Bearer ${token}` })
@@ -135,14 +170,14 @@ const TechnicianManagement = () => {
 
   const handleStatusChange = async (id: string, newStatus: 'available' | 'busy' | 'offline') => {
     try {
-      const token = localStorage.getItem('authToken'); // Replace with your auth token retrieval logic
-      const response = await fetch(`${API_BASE_URL}/technicians/${id}/status`, {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${API_BASE_URL}/api/technicians/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           ...(token && { Authorization: `Bearer ${token}` })
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus, apartmentCode })
       });
 
       if (!response.ok) throw new Error('Failed to update status');
@@ -178,6 +213,7 @@ const TechnicianManagement = () => {
         open={formOpen}
         onClose={() => setFormOpen(false)}
         onSubmit={handleAddTechnician}
+        apartmentCode={apartmentCode}
       />
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

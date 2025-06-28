@@ -20,9 +20,10 @@ interface TechnicianFormProps {
         specialty: string;
         status: 'available' | 'busy' | 'offline';
     }) => void;
+    apartmentCode: string;
 }
 
-const TechnicianForm = ({ open, onClose, onSubmit }: TechnicianFormProps) => {
+const TechnicianForm = ({ open, onClose, onSubmit, apartmentCode }: TechnicianFormProps) => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -76,7 +77,7 @@ const TechnicianForm = ({ open, onClose, onSubmit }: TechnicianFormProps) => {
         try {
             const response = await axios.post(
                 `${API_BASE_URL}/api/add-technicians`,
-                formData,
+                { ...formData, apartmentCode },
                 {
                     headers: {
                         'Content-Type': 'application/json',
