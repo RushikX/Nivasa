@@ -27,18 +27,39 @@ interface TechnicianManagementProps {
 }
 
 const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
+  console.log('🔍 TechnicianManagement component rendered with apartmentCode:', apartmentCode);
+  console.log('🔗 API_BASE_URL:', API_BASE_URL);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [formOpen, setFormOpen] = useState(false);
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
 
+  console.log('🔄 Component state - loading:', loading, 'technicians count:', technicians.length);
+
   // Fetch all technicians on mount
   useEffect(() => {
+    console.log('🚀 useEffect triggered with apartmentCode:', apartmentCode);
     const fetchTechnicians = async () => {
       try {
         console.log('🔍 Fetching technicians for apartmentCode:', apartmentCode);
+        console.log('🔗 Full API URL:', `${API_BASE_URL}/api/all-technicians?apartmentCode=${apartmentCode}`);
+        
+        // Test if the API is reachable first
+        try {
+          const healthResponse = await fetch(`${API_BASE_URL}/api/health`);
+          console.log('🏥 Health check status:', healthResponse.status);
+          if (healthResponse.ok) {
+            const healthData = await healthResponse.json();
+            console.log('🏥 Health check data:', healthData);
+          }
+        } catch (healthError) {
+          console.error('❌ Health check failed:', healthError);
+        }
+        
         const response = await fetch(`${API_BASE_URL}/api/all-technicians?apartmentCode=${apartmentCode}`);
         console.log('📡 Response status:', response.status);
+        console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
         
         if (!response.ok) {
           const errorText = await response.text();
@@ -48,6 +69,8 @@ const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
         
         const data = await response.json();
         console.log('📦 Received data:', data);
+        console.log('📦 Data type:', typeof data);
+        console.log('📦 Data length:', Array.isArray(data) ? data.length : 'Not an array');
         
         // Map _id to id for consistency with frontend interface
         const mappedTechnicians = data.map((tech: any) => ({
@@ -62,10 +85,14 @@ const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
         console.log('✅ Mapped technicians:', mappedTechnicians);
         setTechnicians(mappedTechnicians);
       } catch (error) {
-        console.error('Error fetching technicians:', error);
+        console.error('❌ Error fetching technicians:', error);
+        console.error('❌ Error details:', {
+          message: error instanceof Error ? error.message : 'Unknown error',
+          stack: error instanceof Error ? error.stack : undefined
+        });
         toast({
           title: "Error",
-          description: "Failed to load technicians.",
+          description: `Failed to load technicians: ${error instanceof Error ? error.message : 'Unknown error'}`,
           variant: "destructive"
         });
       } finally {
@@ -197,7 +224,20 @@ const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
   const availableTechnicians = technicians.filter(t => t.status === 'available').length;
 
   if (loading) {
-    return <div>Loading technicians...</div>;
+    console.log('🔄 TechnicianManagement is in loading state');
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center space-x-2">
+          <Wrench className="h-6 w-6 text-blue-600" />
+          <h2 className="text-2xl font-bold">Technician Management</h2>
+        </div>
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p>Loading technicians for apartment: {apartmentCode}</p>
+          <p className="text-sm text-gray-500">Component is rendering...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

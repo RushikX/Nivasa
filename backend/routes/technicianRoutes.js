@@ -2,6 +2,35 @@ const express = require('express');
 const router = express.Router();
 const Technician = require('../models/Technician');
 
+// Test endpoint to check database connection and technicians
+router.get('/test-technicians', async (req, res) => {
+    try {
+        console.log('🧪 Testing technicians database connection...');
+        
+        // Count all technicians
+        const totalTechnicians = await Technician.countDocuments();
+        console.log('📊 Total technicians in database:', totalTechnicians);
+        
+        // Get all technicians (limit to 5 for testing)
+        const allTechnicians = await Technician.find().limit(5);
+        console.log('📦 Sample technicians:', allTechnicians);
+        
+        // Get distinct apartment codes
+        const apartmentCodes = await Technician.distinct('apartmentCode');
+        console.log('🏢 Available apartment codes:', apartmentCodes);
+        
+        res.status(200).json({
+            totalTechnicians,
+            sampleTechnicians: allTechnicians,
+            apartmentCodes,
+            message: 'Database connection successful'
+        });
+    } catch (error) {
+        console.error('❌ Test endpoint error:', error);
+        res.status(500).json({ error: 'Database connection failed', details: error.message });
+    }
+});
+
 // GET all technicians for a specific apartment
 router.get('/all-technicians', async (req, res) => {
     try {
@@ -10,6 +39,8 @@ router.get('/all-technicians', async (req, res) => {
         console.log('🔍 GET /all-technicians called');
         console.log('📦 Query params:', req.query);
         console.log('🏢 apartmentCode:', apartmentCode);
+        console.log('🔗 Full URL:', req.originalUrl);
+        console.log('📋 Request headers:', req.headers);
         
         if (!apartmentCode) {
             console.log('❌ Missing apartmentCode');
@@ -24,6 +55,7 @@ router.get('/all-technicians', async (req, res) => {
         res.status(200).json(technicians);
     } catch (error) {
         console.error('❌ Error fetching technicians:', error);
+        console.error('❌ Error stack:', error.stack);
         res.status(500).json({ error: 'Failed to fetch technicians' });
     }
 });

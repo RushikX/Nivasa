@@ -74,8 +74,14 @@ const AdminDashboard = ({ user }: AdminDashboardProps) => {
   useEffect(() => {
     if (activeTab === 'technicians') {
       console.log('🔍 AdminDashboard passing apartmentCode to TechnicianManagement:', user.apartmentCode);
+      console.log('🔍 Active tab is technicians, should render TechnicianManagement');
     }
   }, [activeTab, user.apartmentCode]);
+
+  // Add debugging for component rendering
+  useEffect(() => {
+    console.log('🔍 AdminDashboard activeTab changed to:', activeTab);
+  }, [activeTab]);
 
   const statsArray = [
     { title: 'Open Tickets', value: stats.open, description: 'Active maintenance requests' },
