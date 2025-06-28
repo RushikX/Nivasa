@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { toast } from '@/components/ui/use-toast';
+import API_BASE_URL from '@/config/api';
 
 interface Technician {
   id: string;
@@ -21,19 +22,21 @@ interface Technician {
   status: 'available' | 'busy' | 'offline';
 }
 
-const TechnicianManagement = () => {
+interface TechnicianManagementProps {
+  apartmentCode: string;
+}
+
+const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [formOpen, setFormOpen] = useState(false);
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const API_BASE_URL = 'nivasa-production-7aa9.up.railway.app/api'; // Updated backend URL
-
   // Fetch all technicians on mount
   useEffect(() => {
     const fetchTechnicians = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/all-technicians`);
+        const response = await fetch(`${API_BASE_URL}/api/all-technicians?apartmentCode=${apartmentCode}`);
         if (!response.ok) throw new Error('Failed to fetch technicians');
         const data = await response.json();
         // Map _id to id for consistency with frontend interface
@@ -58,7 +61,7 @@ const TechnicianManagement = () => {
     };
 
     fetchTechnicians();
-  }, []);
+  }, [apartmentCode]);
 
   const filteredTechnicians = technicians.filter(tech =>
     tech.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -92,8 +95,26 @@ const TechnicianManagement = () => {
     status: 'available' | 'busy' | 'offline';
   }) => {
     try {
-      // Add the new technician to the local state
-      setTechnicians([...technicians, technicianData]);
+      const token = localStorage.getItem('authToken');
+      // Make actual API call to add technician
+      const response = await fetch(`${API_BASE_URL}/api/add-technicians`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { Authorization: `Bearer ${token}` })
+        },
+        body: JSON.stringify({ ...technicianData, apartmentCode })
+      });
+
+      if (!response.ok) throw new Error('Failed to add technician');
+      
+      const newTechnician = await response.json();
+      
+      // Add the new technician to the local state with the correct id
+      setTechnicians([...technicians, {
+        ...technicianData,
+        id: newTechnician._id
+      }]);
       setFormOpen(false);
       toast({
         title: "Technician Added",
@@ -110,9 +131,9 @@ const TechnicianManagement = () => {
 
   const handleDeleteTechnician = async (id: string) => {
     try {
-      const token = localStorage.getItem('authToken'); // Replace with your auth token retrieval logic
+      const token = localStorage.getItem('authToken');
       const techToDelete = technicians.find(tech => tech.id === id);
-      const response = await fetch(`${API_BASE_URL}/technicians/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/technicians/${id}?apartmentCode=${apartmentCode}`, {
         method: 'DELETE',
         headers: {
           ...(token && { Authorization: `Bearer ${token}` })
@@ -136,14 +157,14 @@ const TechnicianManagement = () => {
 
   const handleStatusChange = async (id: string, newStatus: 'available' | 'busy' | 'offline') => {
     try {
-      const token = localStorage.getItem('authToken'); // Replace with your auth token retrieval logic
-      const response = await fetch(`${API_BASE_URL}/technicians/${id}/status`, {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${API_BASE_URL}/api/technicians/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           ...(token && { Authorization: `Bearer ${token}` })
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus, apartmentCode })
       });
 
       if (!response.ok) throw new Error('Failed to update status');
@@ -179,6 +200,7 @@ const TechnicianManagement = () => {
         open={formOpen}
         onClose={() => setFormOpen(false)}
         onSubmit={handleAddTechnician}
+        apartmentCode={apartmentCode}
       />
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
