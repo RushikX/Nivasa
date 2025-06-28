@@ -27,6 +27,9 @@ interface TechnicianManagementProps {
 }
 
 const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
+  console.log('🔍 TechnicianManagement component rendered with apartmentCode:', apartmentCode);
+  console.log('🔗 API_BASE_URL:', API_BASE_URL);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [formOpen, setFormOpen] = useState(false);
   const [technicians, setTechnicians] = useState<Technician[]>([]);
@@ -49,6 +52,15 @@ const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
           });
           setLoading(false);
           return;
+        }
+
+        // First, test if the API is reachable
+        console.log('🔍 Testing API connectivity...');
+        try {
+          const healthResponse = await fetch(`${API_BASE_URL}/api/health`);
+          console.log('🏥 Health check response:', healthResponse.status);
+        } catch (healthError) {
+          console.error('❌ Health check failed:', healthError);
         }
         
         const response = await fetch(`${API_BASE_URL}/api/all-technicians?apartmentCode=${apartmentCode}`);
@@ -212,7 +224,19 @@ const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
   const availableTechnicians = technicians.filter(t => t.status === 'available').length;
 
   if (loading) {
-    return <div>Loading technicians...</div>;
+    console.log('🔄 TechnicianManagement is in loading state');
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center space-x-2">
+          <Wrench className="h-6 w-6 text-blue-600" />
+          <h2 className="text-2xl font-bold">Technician Management</h2>
+        </div>
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p>Loading technicians for apartment: {apartmentCode}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
