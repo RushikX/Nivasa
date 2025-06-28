@@ -27,7 +27,7 @@ const TechnicianManagement = () => {
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const API_BASE_URL = 'http://localhost:5001/api'; // Updated backend URL
+  const API_BASE_URL = 'nivasa-production-7aa9.up.railway.app/api'; // Updated backend URL
 
   // Fetch all technicians on mount
   useEffect(() => {
