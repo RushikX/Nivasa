@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Phone, Mail, Wrench } from 'lucide-react';
-import API_BASE_URL from '@/config/api';
-
 interface Technician {
   id: string;
   name: string;
@@ -12,50 +10,46 @@ interface Technician {
   specialty: string;
   apartmentCode: string;
 }
-
 interface TechniciansListProps {
   apartmentCode: string;
   isAdmin?: boolean;
 }
-
 const TechniciansList = ({ apartmentCode, isAdmin = false }: TechniciansListProps) => {
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
-    const fetchTechnicians = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/all-technicians?apartmentCode=${apartmentCode}`);
-        if (!response.ok) throw new Error('Failed to fetch technicians');
-        const data = await response.json();
-        
-        // Map _id to id for consistency with frontend interface
-        const mappedTechnicians = data.map((tech: any) => ({
-          id: tech._id,
-          name: tech.name,
-          phone: tech.phone,
-          email: tech.email,
-          specialty: tech.specialty,
-          apartmentCode: tech.apartmentCode
-        }));
-        
-        setTechnicians(mappedTechnicians);
-      } catch (error) {
-        console.error('Error fetching technicians:', error);
-        // Fallback to empty array if API fails
-        setTechnicians([]);
-      } finally {
-        setIsLoading(false);
+    // Mock data for now - will be replaced with actual database call
+    const mockTechnicians: Technician[] = [
+      {
+        id: '1',
+        name: 'John Smith',
+        phone: '+1-555-0123',
+        email: 'john.smith@maintenance.com',
+        specialty: 'Plumbing',
+        apartmentCode
+      },
+      {
+        id: '2',
+        name: 'Maria Garcia',
+        phone: '+1-555-0124',
+        email: 'maria.garcia@maintenance.com',
+        specialty: 'Electrical',
+        apartmentCode
+      },
+      {
+        id: '3',
+        name: 'David Wilson',
+        phone: '+1-555-0125',
+        email: 'david.wilson@maintenance.com',
+        specialty: 'HVAC',
+        apartmentCode
       }
-    };
-
-    if (apartmentCode) {
-      fetchTechnicians();
-    } else {
+    ];
+    setTimeout(() => {
+      setTechnicians(mockTechnicians);
       setIsLoading(false);
-    }
+    }, 500);
   }, [apartmentCode]);
-
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -99,3 +93,4 @@ const TechniciansList = ({ apartmentCode, isAdmin = false }: TechniciansListProp
     </div>
   );
 };
+export default TechniciansList;
