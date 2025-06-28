@@ -36,9 +36,34 @@ const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
   useEffect(() => {
     const fetchTechnicians = async () => {
       try {
+        console.log('🔍 Fetching technicians for apartmentCode:', apartmentCode);
+        console.log('🔗 API URL:', `${API_BASE_URL}/api/all-technicians?apartmentCode=${apartmentCode}`);
+        
+        // Check if apartmentCode is valid
+        if (!apartmentCode || apartmentCode.trim() === '') {
+          console.error('❌ Invalid apartmentCode:', apartmentCode);
+          toast({
+            title: "Error",
+            description: "Invalid apartment code. Please contact your administrator.",
+            variant: "destructive"
+          });
+          setLoading(false);
+          return;
+        }
+        
         const response = await fetch(`${API_BASE_URL}/api/all-technicians?apartmentCode=${apartmentCode}`);
-        if (!response.ok) throw new Error('Failed to fetch technicians');
+        console.log('📡 Response status:', response.status);
+        console.log('📡 Response headers:', response.headers);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ Response not ok:', response.status, errorText);
+          throw new Error(`Failed to fetch technicians: ${response.status} ${errorText}`);
+        }
+        
         const data = await response.json();
+        console.log('📦 Received data:', data);
+        
         // Map _id to id for consistency with frontend interface
         const mappedTechnicians = data.map((tech: any) => ({
           id: tech._id,
@@ -48,11 +73,14 @@ const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
           specialty: tech.specialty,
           status: tech.status
         }));
+        
+        console.log('✅ Mapped technicians:', mappedTechnicians);
         setTechnicians(mappedTechnicians);
       } catch (error) {
+        console.error('❌ Error fetching technicians:', error);
         toast({
           title: "Error",
-          description: "Failed to load technicians.",
+          description: `Failed to load technicians: ${error instanceof Error ? error.message : 'Unknown error'}`,
           variant: "destructive"
         });
       } finally {

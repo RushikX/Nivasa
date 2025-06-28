@@ -7,14 +7,23 @@ router.get('/all-technicians', async (req, res) => {
     try {
         const { apartmentCode } = req.query;
         
+        console.log('🔍 GET /all-technicians called');
+        console.log('📦 Query params:', req.query);
+        console.log('🏢 apartmentCode:', apartmentCode);
+        
         if (!apartmentCode) {
+            console.log('❌ Missing apartmentCode');
             return res.status(400).json({ error: 'Apartment code is required' });
         }
 
+        console.log('🔍 Searching for technicians with apartmentCode:', apartmentCode);
         const technicians = await Technician.find({ apartmentCode }).sort({ createdAt: -1 });
+        console.log('✅ Found technicians:', technicians.length);
+        console.log('📦 Technicians data:', technicians);
+        
         res.status(200).json(technicians);
     } catch (error) {
-        console.error('Error fetching technicians:', error);
+        console.error('❌ Error fetching technicians:', error);
         res.status(500).json({ error: 'Failed to fetch technicians' });
     }
 });

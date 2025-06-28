@@ -38,6 +38,9 @@ const Dashboard = () => {
           }
         );
         console.log('Dashboard received user data from validate:', res.data);
+        console.log('🔍 User apartmentCode:', res.data.apartmentCode);
+        console.log('🔍 User role:', res.data.role);
+        console.log('🔍 User phone:', res.data.phone);
         setUser(res.data);
       } catch (err: any) {
         console.error("Validation failed:", err);

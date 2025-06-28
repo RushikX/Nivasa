@@ -70,6 +70,13 @@ const AdminDashboard = ({ user }: AdminDashboardProps) => {
     fetchBankDetails();
   }, [user.apartmentCode]);
 
+  // Add debugging for apartmentCode
+  useEffect(() => {
+    if (activeTab === 'technicians') {
+      console.log('🔍 AdminDashboard passing apartmentCode to TechnicianManagement:', user.apartmentCode);
+    }
+  }, [activeTab, user.apartmentCode]);
+
   const statsArray = [
     { title: 'Open Tickets', value: stats.open, description: 'Active maintenance requests' },
     { title: 'Resolved Tickets', value: stats.resolved, description: 'Resolved requests' }
