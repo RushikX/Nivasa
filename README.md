@@ -18,10 +18,8 @@ A **modern, full-stack web application** for managing apartment communities, bui
 - [🧑‍💻 Getting Started (Local)](#🧑‍💻-getting-started-local)
 - [☁️ Deployment (Railway)](#☁️-deployment-railway)
 - [🔑 Environment Variables](#🔑-environment-variables)
-- [🔌 API Overview](#🔌-api-overview)
 - [🛠️ Customization](#🛠️-customization)
 - [🤝 Contributing](#🤝-contributing)
-- [📄 License](#📄-license)
 
 ---
 
