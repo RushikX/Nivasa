@@ -593,7 +593,6 @@ router.put("/update-resident/:userId", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
 // -- Delete Resident (Admin only)
 router.delete("/delete-resident/:userId", async (req, res) => {
   try {
@@ -632,5 +631,6 @@ router.delete("/delete-resident/:userId", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 module.exports = router;
