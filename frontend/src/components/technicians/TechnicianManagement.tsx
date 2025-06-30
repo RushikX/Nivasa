@@ -45,7 +45,7 @@ const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
       try {
         console.log('🔍 Fetching technicians for apartmentCode:', apartmentCode);
         console.log('🔗 API URL:', `${API_BASE_URL}/api/all-technicians?apartmentCode=${apartmentCode}`);
-        
+
         // Check if apartmentCode is valid
         if (!apartmentCode || apartmentCode.trim() === '') {
           console.error('❌ Invalid apartmentCode:', apartmentCode);
@@ -57,20 +57,20 @@ const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
           setLoading(false);
           return;
         }
-        
+
         const response = await fetch(`${API_BASE_URL}/api/all-technicians?apartmentCode=${apartmentCode}`);
         console.log('📡 Response status:', response.status);
         console.log('📡 Response headers:', response.headers);
-        
+
         if (!response.ok) {
           const errorText = await response.text();
           console.error('❌ Response not ok:', response.status, errorText);
           throw new Error(`Failed to fetch technicians: ${response.status} ${errorText}`);
         }
-        
+
         const data = await response.json();
         console.log('📦 Received data:', data);
-        
+
         // Map _id to id for consistency with frontend interface
         const mappedTechnicians = data.map((tech: any) => ({
           id: tech._id,
@@ -80,16 +80,9 @@ const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
           specialty: tech.specialty,
           status: tech.status
         }));
-        
+
         console.log('✅ Mapped technicians:', mappedTechnicians);
         setTechnicians(mappedTechnicians);
-      } catch (error) {
-        console.error('❌ Error fetching technicians:', error);
-        toast({
-          title: "Error",
-          description: `Failed to load technicians: ${error instanceof Error ? error.message : 'Unknown error'}`,
-          variant: "destructive"
-        });
       } finally {
         setLoading(false);
       }
@@ -132,7 +125,7 @@ const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
     try {
       console.log('🔍 Adding technician with data:', { ...technicianData, apartmentCode });
       console.log('🔍 API URL:', `${API_BASE_URL}/api/add-technicians`);
-      
+
       // Make actual API call to add technician
       const response = await fetch(`${API_BASE_URL}/api/add-technicians`, {
         method: 'POST',
@@ -143,16 +136,16 @@ const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
       });
 
       console.log('📡 Add technician response status:', response.status);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('❌ Add technician failed:', response.status, errorText);
         throw new Error(`Failed to add technician: ${response.status} ${errorText}`);
       }
-      
+
       const newTechnician = await response.json();
       console.log('✅ New technician created:', newTechnician);
-      
+
       // Add the new technician to the local state with the correct id
       setTechnicians([...technicians, {
         ...technicianData,
@@ -165,11 +158,7 @@ const TechnicianManagement = ({ apartmentCode }: TechnicianManagementProps) => {
       });
     } catch (error) {
       console.error('❌ Error in handleAddTechnician:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add technician.",
-        variant: "destructive"
-      });
+      
     }
   };
 
