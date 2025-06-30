@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Building2, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Building2, Eye, EyeOff, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,9 +14,6 @@ import {
 import { toast } from "@/hooks/use-toast";
 import axios from "axios";
 
-// Get the current domain for API calls
-const API_BASE_URL = window.location.origin;
-
 const ResidentRegistration = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -27,18 +24,70 @@ const ResidentRegistration = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [flatNumberStatus, setFlatNumberStatus] = useState({
+    checking: false,
+    available: null,
+    message: "",
+  });
   const navigate = useNavigate();
+
+  // Debounced flat number availability check
+  useEffect(() => {
+    if (formData.flatNumber && formData.apartmentCode) {
+      const timeoutId = setTimeout(() => {
+        checkFlatNumberAvailability();
+      }, 500);
+
+      return () => clearTimeout(timeoutId);
+    } else {
+      setFlatNumberStatus({ checking: false, available: null, message: "" });
+    }
+  }, [formData.flatNumber, formData.apartmentCode]);
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const checkFlatNumberAvailability = async () => {
+    if (!formData.flatNumber || !formData.apartmentCode) return;
+
+    setFlatNumberStatus({ checking: true, available: null, message: "" });
+
+    try {
+      const response = await axios.get(
+        `https://nivasa-production-7aa9.up.railway.app/api/auth/check-flat-availability?flatNumber=${encodeURIComponent(formData.flatNumber)}&apartmentCode=${encodeURIComponent(formData.apartmentCode)}`
+      );
+
+      setFlatNumberStatus({
+        checking: false,
+        available: response.data.isAvailable,
+        message: response.data.message,
+      });
+    } catch (error: any) {
+      setFlatNumberStatus({
+        checking: false,
+        available: false,
+        message: error.response?.data?.error || "Error checking availability",
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Check if flat number is available before submitting
+    if (flatNumberStatus.available === false) {
+      toast({
+        title: "Flat number not available",
+        description: "Please choose a different flat number",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      await axios.post(`${API_BASE_URL}/api/auth/signup-resident`, {
+      await axios.post("https://nivasa-production-7aa9.up.railway.app/api/auth/signup-resident", {
         username: formData.username,
         phoneNumber: formData.phone,
         flatNumber: formData.flatNumber,
@@ -60,6 +109,25 @@ const ResidentRegistration = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const getFlatNumberStatusIcon = () => {
+    if (flatNumberStatus.checking) {
+      return <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full" />;
+    }
+    if (flatNumberStatus.available === true) {
+      return <CheckCircle className="h-4 w-4 text-green-500" />;
+    }
+    if (flatNumberStatus.available === false) {
+      return <XCircle className="h-4 w-4 text-red-500" />;
+    }
+    return null;
+  };
+
+  const getFlatNumberStatusColor = () => {
+    if (flatNumberStatus.available === true) return "text-green-600";
+    if (flatNumberStatus.available === false) return "text-red-600";
+    return "text-gray-500";
   };
 
   return (
@@ -110,17 +178,6 @@ const ResidentRegistration = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="flatNumber">Flat Number</Label>
-              <Input
-                id="flatNumber"
-                value={formData.flatNumber}
-                onChange={(e) => handleChange("flatNumber", e.target.value)}
-                placeholder="e.g., 2A, 15B, 101"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="apartmentCode">Apartment Code</Label>
               <Input
                 id="apartmentCode"
@@ -131,6 +188,33 @@ const ResidentRegistration = () => {
               />
               <p className="text-xs text-gray-500">
                 Get this code from your apartment admin or another resident
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="flatNumber">Flat Number</Label>
+              <div className="relative">
+                <Input
+                  id="flatNumber"
+                  value={formData.flatNumber}
+                  onChange={(e) => handleChange("flatNumber", e.target.value)}
+                  placeholder="e.g., 2A, 15B, 101"
+                  required
+                  className={flatNumberStatus.available === false ? "border-red-500" : ""}
+                />
+                {flatNumberStatus.checking || flatNumberStatus.available !== null ? (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    {getFlatNumberStatusIcon()}
+                  </div>
+                ) : null}
+              </div>
+              {flatNumberStatus.message && (
+                <p className={`text-xs ${getFlatNumberStatusColor()}`}>
+                  {flatNumberStatus.message}
+                </p>
+              )}
+              <p className="text-xs text-gray-500">
+                Each flat number must be unique within your apartment
               </p>
             </div>
 
@@ -161,7 +245,11 @@ const ResidentRegistration = () => {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading || flatNumberStatus.available === false}
+            >
               {isLoading ? "Creating Account..." : "Join Apartment"}
             </Button>
           </form>

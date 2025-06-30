@@ -10,4 +10,7 @@ const userSchema = new mongoose.Schema({
   apartment: { type: mongoose.Schema.Types.ObjectId, ref: 'Apartment', required: true },
 });
 
+// Add compound index to ensure flat numbers are unique within the same apartment
+userSchema.index({ flatNumber: 1, apartment: 1 }, { unique: true });
+
 module.exports = mongoose.model('User', userSchema);

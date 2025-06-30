@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Apartment = require("../models/Apartment");
+//const User = require("../models/User");
 const Complaint = require("../models/Complaint");
 const MaintenancePayment = require("../models/MaintenancePayment");
 const bcrypt = require("bcryptjs");
@@ -62,8 +63,17 @@ const signupUser = async (req, res, role) => {
     const apartment = await Apartment.findOne({ apartmentCode });
     if (!apartment) return res.status(400).json({ error: "Invalid apartment code" });
 
+    // Check if user with same phone number already exists in this apartment
     const existingUser = await User.findOne({ phoneNumber, apartment: apartment._id });
     if (existingUser) return res.status(400).json({ error: "User already exists" });
+
+    // Check if flat number is already taken in this apartment
+    const existingFlat = await User.findOne({ flatNumber, apartment: apartment._id });
+    if (existingFlat) {
+      return res.status(400).json({
+        error: `Flat number ${flatNumber} is already registered in this apartment. Please choose a different flat number.`
+      });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({
@@ -348,18 +358,22 @@ router.get('/maintenance/payments', async (req, res) => {
 // Set or update bank details (admin)
 router.post('/maintenance/bank-details', async (req, res) => {
   try {
-    console.log('=== BANK DETAILS UPDATE REQUEST ===');
-    console.log('Full request body:', req.body);
-    
-    const { apartmentCode, accountHolder, accountNumber, ifscCode, bankName, branch, upiId } = req.body;
-    console.log('Updating bank details for apartment:', apartmentCode);
-    console.log('Bank details data:', { accountHolder, accountNumber, ifscCode, bankName, branch, upiId });
-    
+    const {
+      apartmentCode,
+      accountHolder,
+      accountNumber,
+      ifscCode,
+      bankName,
+      branch,
+      upiId
+    } = req.body;
+
+    console.log('Received bank details request:', req.body);
+
     if (!apartmentCode) {
-      console.log('ERROR: apartmentCode is missing');
-      return res.status(400).json({ error: 'apartmentCode is required' });
+      return res.status(400).json({ error: 'Apartment code is required' });
     }
-    
+
     const bankDetails = {
       accountHolder,
       accountNumber,
@@ -368,59 +382,49 @@ router.post('/maintenance/bank-details', async (req, res) => {
       branch,
       upiId
     };
-    
-    console.log('Searching for apartment with code:', apartmentCode);
-    const existingApartment = await Apartment.findOne({ apartmentCode });
-    console.log('Existing apartment found:', existingApartment ? 'Yes' : 'No');
-    if (existingApartment) {
-      console.log('Existing apartment details:', {
-        name: existingApartment.name,
-        apartmentCode: existingApartment.apartmentCode,
-        currentBankDetails: existingApartment.bankDetails
-      });
-    }
-    
+
+    console.log('Processed bank details:', bankDetails);
+
     const apartment = await Apartment.findOneAndUpdate(
       { apartmentCode },
       { bankDetails },
       { new: true }
     );
-    
-    console.log('Apartment found and updated:', apartment ? 'Yes' : 'No');
-    
+
     if (!apartment) {
-      console.log('ERROR: Apartment not found with code:', apartmentCode);
       return res.status(404).json({ error: 'Apartment not found' });
     }
-    
-    console.log('Updated bank details:', apartment.bankDetails);
-    console.log('=== END BANK DETAILS UPDATE ===');
-    res.status(200).json({ message: 'Bank details updated', bankDetails: apartment.bankDetails });
+
+    console.log('Updated apartment bank details:', apartment.bankDetails);
+
+    res.status(200).json({
+      message: 'Bank details updated successfully',
+      bankDetails: apartment.bankDetails
+    });
   } catch (err) {
     console.error('Error updating bank details:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Get bank details (resident)
+// Get bank details (for both admin and resident)
 router.get('/maintenance/bank-details', async (req, res) => {
   try {
     const { apartmentCode } = req.query;
-    console.log('Fetching bank details for apartment:', apartmentCode);
-    
+
     if (!apartmentCode) {
-      return res.status(400).json({ error: 'apartmentCode is required' });
+      return res.status(400).json({ error: 'Apartment code is required' });
     }
-    
+
     const apartment = await Apartment.findOne({ apartmentCode });
-    console.log('Found apartment:', apartment ? 'Yes' : 'No');
-    
+
     if (!apartment) {
       return res.status(404).json({ error: 'Apartment not found' });
     }
-    
-    console.log('Bank details:', apartment.bankDetails);
-    res.status(200).json({ bankDetails: apartment.bankDetails });
+
+    res.status(200).json({
+      bankDetails: apartment.bankDetails || null
+    });
   } catch (err) {
     console.error('Error fetching bank details:', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -499,5 +503,35 @@ router.post('/fix-complaints-user', async (req, res) => {
   }
 });
 
-module.exports = router;
+// -- Check Flat Number Availability
+router.get("/check-flat-availability", async (req, res) => {
+  try {
+    const { flatNumber, apartmentCode } = req.query;
 
+    if (!flatNumber || !apartmentCode) {
+      return res.status(400).json({ error: "Flat number and apartment code are required" });
+    }
+
+    const apartment = await Apartment.findOne({ apartmentCode });
+    if (!apartment) {
+      return res.status(404).json({ error: "Apartment not found" });
+    }
+
+    const existingFlat = await User.findOne({ flatNumber, apartment: apartment._id });
+    const isAvailable = !existingFlat;
+
+    res.status(200).json({
+      isAvailable,
+      flatNumber,
+      apartmentCode,
+      message: isAvailable
+        ? `Flat number ${flatNumber} is available`
+        : `Flat number ${flatNumber} is already registered in this apartment`
+    });
+  } catch (err) {
+    console.error("Flat availability check error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+module.exports = router;
