@@ -151,7 +151,7 @@ const AdminNeighborsList = ({ apartmentCode, currentUserFlatNumber }: AdminNeigh
         setIsDeleting(true);
         try {
             console.log('Attempting to delete resident:', neighbor._id);
-            const response = await axios.delete(`https://nivasa-production-7aa9.up.railway.app//api/auth/delete-resident/${neighbor._id}`);
+            const response = await axios.delete(`https://nivasa-production-7aa9.up.railway.app/api/auth/delete-resident/${neighbor._id}`);
             console.log('Delete response:', response.data);
 
             toast({
