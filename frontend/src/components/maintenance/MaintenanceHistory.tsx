@@ -10,6 +10,7 @@ import { Calendar, DollarSign, Plus, CheckCircle, XCircle, Clock } from 'lucide-
 import { toast } from '@/hooks/use-toast';
 import axios from 'axios';
 import API_BASE_URL from '@/config/api';
+import QRCode from 'qrcode';
 
 interface MaintenanceRecord {
   id: string;
@@ -21,12 +22,27 @@ interface MaintenanceRecord {
   submittedDate: string;
   approvedBy?: string;
   approvedDate?: string;
+  months?: string[];
 }
 
 interface MaintenanceHistoryProps {
   apartmentCode: string;
   isAdmin: boolean;
   userFlatNumber?: string;
+}
+
+// Define props for PaymentRequestForm
+interface PaymentRequestFormProps {
+  maintenanceAmount: number;
+  userFlatNumber?: string;
+  monthsList: string[];
+  bankDetails: any;
+  setShowSubmitDialog: (open: boolean) => void;
+  paymentRequests: any[];
+  setPaymentRequests: (requests: any[]) => void;
+  toast: any;
+  API_BASE_URL: string;
+  apartmentCode: string;
 }
 
 const MaintenanceHistory = ({ apartmentCode, isAdmin, userFlatNumber }: MaintenanceHistoryProps) => {
@@ -48,6 +64,7 @@ const MaintenanceHistory = ({ apartmentCode, isAdmin, userFlatNumber }: Maintena
   const [editAmount, setEditAmount] = useState<string>('');
   const [upiTransactionId, setUpiTransactionId] = useState('');
   const [bankDetails, setBankDetails] = useState<any>(null);
+  const [upiQrUrl, setUpiQrUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -158,7 +175,8 @@ const MaintenanceHistory = ({ apartmentCode, isAdmin, userFlatNumber }: Maintena
       await axios.post(`${API_BASE_URL}/api/auth/maintenance/payment`, {
         apartmentCode,
         flatNumber: userFlatNumber,
-        transactionId: upiTransactionId
+        transactionId: upiTransactionId,
+        months: selectedMonths
       });
       toast({ title: 'Success', description: 'Payment request submitted' });
       setSelectedMonths([]);
@@ -218,30 +236,18 @@ const MaintenanceHistory = ({ apartmentCode, isAdmin, userFlatNumber }: Maintena
                   Submit a request for maintenance expenses you've paid for.
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label>Amount (₹)</Label>
-                  <Input value={maintenanceAmount * selectedMonths.length || ''} />
-                </div>
-                <div>
-                  <Label>Flat Number</Label>
-                  <Input value={userFlatNumber} readOnly />
-                </div>
-                <div>
-                  <Label>Months</Label>
-                  <select multiple className="w-full border rounded p-2" value={selectedMonths} onChange={e => setSelectedMonths(Array.from(e.target.selectedOptions, o => o.value))}>
-                    {monthsList.map(month => <option key={month} value={month}>{month}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <Label>UPI Transaction ID</Label>
-                  <Input value={upiTransactionId} onChange={e => setUpiTransactionId(e.target.value)} placeholder="Enter UPI Transaction ID" />
-                </div>
-                <div className="flex space-x-2">
-                  <Button onClick={handlePaymentSubmit} className="flex-1">Submit Payment</Button>
-                  <Button variant="outline" onClick={() => setShowSubmitDialog(false)} className="flex-1">Cancel</Button>
-                </div>
-              </div>
+              <PaymentRequestForm 
+                maintenanceAmount={maintenanceAmount}
+                userFlatNumber={userFlatNumber}
+                monthsList={monthsList}
+                bankDetails={bankDetails}
+                setShowSubmitDialog={setShowSubmitDialog}
+                paymentRequests={paymentRequests}
+                setPaymentRequests={setPaymentRequests}
+                toast={toast}
+                API_BASE_URL={API_BASE_URL}
+                apartmentCode={apartmentCode}
+              />
             </DialogContent>
           </Dialog>
         )}
@@ -279,11 +285,6 @@ const MaintenanceHistory = ({ apartmentCode, isAdmin, userFlatNumber }: Maintena
               </CardHeader>
               <CardContent>
                 <p className="text-gray-700 mb-4">Transaction ID: {payment.transactionId}</p>
-                {payment.status !== 'pending' && (
-                  <p className="text-sm text-gray-500">
-                    {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)} on {new Date(payment.updatedAt).toLocaleDateString()}
-                  </p>
-                )}
                 {isAdmin && payment.status === 'pending' && (
                   <div className="flex space-x-2 mt-4">
                     <Button
@@ -444,5 +445,107 @@ const MaintenanceHistory = ({ apartmentCode, isAdmin, userFlatNumber }: Maintena
     </div>
   );
 };
+
+// PaymentRequestForm: Handles the payment request dialog, including months selection, total calculation, and UPI QR/link
+function PaymentRequestForm({
+  maintenanceAmount,
+  userFlatNumber,
+  monthsList,
+  bankDetails,
+  setShowSubmitDialog,
+  paymentRequests,
+  setPaymentRequests,
+  toast,
+  API_BASE_URL,
+  apartmentCode
+}: PaymentRequestFormProps) {
+  const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
+  const [upiTransactionId, setUpiTransactionId] = useState('');
+  const [upiQrUrl, setUpiQrUrl] = useState<string | null>(null);
+
+  const totalAmount = maintenanceAmount * (selectedMonths.length || 1);
+
+  useEffect(() => {
+    if (!bankDetails?.upiId || !maintenanceAmount) {
+      setUpiQrUrl(null);
+      return;
+    }
+    const upiId = bankDetails.upiId;
+    const name = bankDetails.accountHolder || 'Apartment';
+    const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(name)}&am=${totalAmount}&cu=INR`;
+    QRCode.toDataURL(upiLink, { width: 160, margin: 2 }, (err: any, url: string) => {
+      if (!err) setUpiQrUrl(url);
+    });
+  }, [bankDetails, maintenanceAmount, selectedMonths, totalAmount]);
+
+  const handlePaymentSubmit = async () => {
+    if (!maintenanceAmount || !userFlatNumber || selectedMonths.length === 0 || !upiTransactionId) {
+      toast({ title: 'Error', description: 'Please fill all fields and enter UPI Transaction ID', variant: 'destructive' });
+      return;
+    }
+    try {
+      await axios.post(`${API_BASE_URL}/api/auth/maintenance/payment`, {
+        apartmentCode,
+        flatNumber: userFlatNumber,
+        transactionId: upiTransactionId,
+        months: selectedMonths
+      });
+      toast({ title: 'Success', description: 'Payment request submitted' });
+      setSelectedMonths([]);
+      setUpiTransactionId('');
+      setShowSubmitDialog(false);
+      // Refresh payment requests
+      const paymentsRes = await axios.get(`${API_BASE_URL}/api/auth/maintenance/payments?apartmentCode=${apartmentCode}`);
+      setPaymentRequests(paymentsRes.data.payments);
+    } catch (err) {
+      toast({ title: 'Error', description: 'Failed to submit payment request', variant: 'destructive' });
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label>Flat Number</Label>
+        <Input value={userFlatNumber} readOnly />
+      </div>
+      <div>
+        <Label>Months</Label>
+        <select multiple className="w-full border rounded p-2" value={selectedMonths} onChange={e => setSelectedMonths(Array.from(e.target.selectedOptions, o => o.value))}>
+          {monthsList.map(month => <option key={month} value={month}>{month}</option>)}
+        </select>
+      </div>
+      <div>
+        <Label>Total Amount (₹)</Label>
+        <Input value={totalAmount} readOnly />
+      </div>
+      {bankDetails?.upiId && (
+        <div className="flex flex-col items-center gap-2">
+          <a
+            href={`upi://pay?pa=${encodeURIComponent(bankDetails.upiId)}&pn=${encodeURIComponent(bankDetails.accountHolder || 'Apartment')}&am=${totalAmount}&cu=INR`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline mb-2"
+          >
+            Pay via UPI App
+          </a>
+          {upiQrUrl && (
+            <img src={upiQrUrl} alt="UPI QR Code" width={160} height={160} style={{ background: '#fff', padding: 8, borderRadius: 8 }} />
+          )}
+          <div className="text-xs text-gray-500 mt-2">
+            UPI ID: <span className="font-mono">{bankDetails.upiId}</span>
+          </div>
+        </div>
+      )}
+      <div>
+        <Label>UPI Transaction ID</Label>
+        <Input value={upiTransactionId} onChange={e => setUpiTransactionId(e.target.value)} placeholder="Enter UPI Transaction ID" />
+      </div>
+      <div className="flex space-x-2">
+        <Button onClick={handlePaymentSubmit} className="flex-1">Submit Payment</Button>
+        <Button variant="outline" onClick={() => setShowSubmitDialog(false)} className="flex-1">Cancel</Button>
+      </div>
+    </div>
+  );
+}
 
 export default MaintenanceHistory;

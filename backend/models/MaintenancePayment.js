@@ -21,6 +21,10 @@ const maintenancePaymentSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'approved', 'rejected'],
     default: 'pending'
+  },
+  months: {
+    type: [String],
+    required: true
   }
 }, { timestamps: true });
 

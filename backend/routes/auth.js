@@ -1,11 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const Apartment = require("../models/Apartment");
-//const User = require("../models/User");
 const Complaint = require("../models/Complaint");
 const MaintenancePayment = require("../models/MaintenancePayment");
 const bcrypt = require("bcryptjs");
-const User = require('../models/User');
+const User = require('../models/user');
 
 // -- Register Apartment
 router.post("/register-apartment", async (req, res) => {
@@ -178,8 +177,6 @@ router.post("/new-complaint", async (req, res) => {
       apartment: user.apartment._id
     });
 
-
-
     await complaint.save();
     res.status(201).json({ message: "Complaint created", complaint });
   } catch (err) {
@@ -187,8 +184,6 @@ router.post("/new-complaint", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-
 
 // -- Get All Complaints by Phone Number
 // GET all complaints
