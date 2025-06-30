@@ -5,7 +5,7 @@ const Apartment = require("../models/Apartment");
 const Complaint = require("../models/Complaint");
 const MaintenancePayment = require("../models/MaintenancePayment");
 const bcrypt = require("bcryptjs");
-const User = require('../models/User');
+const User = require('../models/user');
 
 // -- Register Apartment
 router.post("/register-apartment", async (req, res) => {
@@ -530,6 +530,110 @@ router.get("/check-flat-availability", async (req, res) => {
     });
   } catch (err) {
     console.error("Flat availability check error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// -- Update Resident (Admin only)
+router.put("/update-resident/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { username, phoneNumber, flatNumber } = req.body;
+
+    console.log('Update resident request:', { userId, username, phoneNumber, flatNumber });
+
+    // Validate required fields
+    if (!username || !phoneNumber || !flatNumber) {
+      return res.status(400).json({ error: "Username, phone number, and flat number are required" });
+    }
+
+    // Find the user to update
+    const user = await User.findById(userId).populate("apartment");
+    if (!user) {
+      console.log('User not found:', userId);
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    console.log('Found user:', { _id: user._id, username: user.username, flatNumber: user.flatNumber });
+
+    // Check if flat number is already taken by another user in the same apartment
+    if (flatNumber !== user.flatNumber) {
+      const existingFlat = await User.findOne({
+        flatNumber,
+        apartment: user.apartment._id,
+        _id: { $ne: userId } // Exclude current user
+      });
+
+      if (existingFlat) {
+        console.log('Flat number already taken:', { flatNumber, existingUser: existingFlat.username });
+        return res.status(400).json({
+          error: `Flat number ${flatNumber} is already registered by another resident in this apartment.`
+        });
+      }
+    }
+
+    // Update user fields
+    user.username = username;
+    user.phoneNumber = phoneNumber;
+    user.flatNumber = flatNumber;
+
+    await user.save();
+    console.log('User updated successfully:', { _id: user._id, username: user.username, flatNumber: user.flatNumber });
+
+    res.status(200).json({
+      message: "Resident updated successfully",
+      user: {
+        _id: user._id,
+        username: user.username,
+        phoneNumber: user.phoneNumber,
+        flatNumber: user.flatNumber,
+        role: user.role
+      }
+    });
+  } catch (err) {
+    console.error("Update resident error:", err);
+    if (err.code === 11000) {
+      return res.status(400).json({ error: "Flat number already exists in this apartment" });
+    }
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// -- Delete Resident (Admin only)
+router.delete("/delete-resident/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log('Delete resident request:', { userId });
+
+    // Find the user to delete
+    const user = await User.findById(userId);
+    if (!user) {
+      console.log('User not found for deletion:', userId);
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    console.log('Found user for deletion:', { _id: user._id, username: user.username, role: user.role });
+
+    // Prevent deletion of admin users
+    if (user.role === 'admin') {
+      console.log('Attempted to delete admin user:', user.username);
+      return res.status(403).json({ error: "Admin users cannot be deleted" });
+    }
+
+    // Delete the user
+    await User.findByIdAndDelete(userId);
+    console.log('User deleted successfully:', { _id: user._id, username: user.username });
+
+    res.status(200).json({
+      message: "Resident deleted successfully",
+      deletedUser: {
+        _id: user._id,
+        username: user.username,
+        flatNumber: user.flatNumber
+      }
+    });
+  } catch (err) {
+    console.error("Delete resident error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });

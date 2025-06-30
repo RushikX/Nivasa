@@ -10,6 +10,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import TicketManagement from '@/components/tickets/TicketManagement';
 import NeighborsList from '@/components/neighbors/NeighborsList';
+import AdminNeighborsList from '@/components/neighbors/AdminNeighborsList';
 import MaintenanceHistory from '@/components/maintenance/MaintenanceHistory';
 import ProfilePage from '@/components/profile/ProfilePage';
 import { useNavigate } from 'react-router-dom';
@@ -18,11 +19,18 @@ import CreateTicketForm from '../tickets/CreateTicketForm';
 import axios from 'axios';
 import { Input } from '@/components/ui/input';
 import TechnicianManagement from '@/components/technicians/TechnicianManagement';
-import type { User } from "@/components/profile/ProfilePage";
-import API_BASE_URL from '@/config/api';
+
+interface AdminUser {
+  username?: string;
+  phone: string;
+  role: string;
+  name?: string;
+  flatNumber?: string;
+  apartmentCode?: string;
+}
 
 interface AdminDashboardProps {
-  user: User;
+  user: AdminUser;
 }
 
 const AdminDashboard = ({ user }: AdminDashboardProps) => {
@@ -30,22 +38,12 @@ const AdminDashboard = ({ user }: AdminDashboardProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [stats, setStats] = useState({ open: 0, resolved: 0 });
   const navigate = useNavigate();
-  const [bankDetails, setBankDetails] = useState<any>(null);
-  const [editBankDetails, setEditBankDetails] = useState({
-    accountHolder: '',
-    accountNumber: '',
-    ifscCode: '',
-    bankName: '',
-    branch: '',
-    upiId: ''
-  });
-  const [bankLoading, setBankLoading] = useState(false);
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
     const fetchStats = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/auth/stats/${user.apartmentCode}`);
+        const res = await axios.get(`https://nivasa-production-7aa9.up.railway.app/api/auth/stats/${user.apartmentCode}`);
         setStats(res.data);
       } catch (err) {
         console.error('Failed to fetch ticket stats:', err);
@@ -55,33 +53,6 @@ const AdminDashboard = ({ user }: AdminDashboardProps) => {
     intervalId = setInterval(fetchStats, 5000);
     return () => clearInterval(intervalId);
   }, [user.apartmentCode]);
-
-  useEffect(() => {
-    // Fetch bank details
-    const fetchBankDetails = async () => {
-      try {
-        const res = await axios.get(`${API_BASE_URL}/api/auth/maintenance/bank-details?apartmentCode=${user.apartmentCode}`);
-        setBankDetails(res.data.bankDetails);
-        setEditBankDetails(res.data.bankDetails || editBankDetails);
-      } catch (err) {
-        // ignore if not set
-      }
-    };
-    fetchBankDetails();
-  }, [user.apartmentCode]);
-
-  // Add debugging for apartmentCode
-  useEffect(() => {
-    if (activeTab === 'technicians') {
-      console.log('🔍 AdminDashboard passing apartmentCode to TechnicianManagement:', user.apartmentCode);
-      console.log('🔍 Active tab is technicians, should render TechnicianManagement');
-    }
-  }, [activeTab, user.apartmentCode]);
-
-  // Add debugging for component rendering
-  useEffect(() => {
-    console.log('🔍 AdminDashboard activeTab changed to:', activeTab);
-  }, [activeTab]);
 
   const statsArray = [
     { title: 'Open Tickets', value: stats.open, description: 'Active maintenance requests' },
@@ -107,26 +78,6 @@ const AdminDashboard = ({ user }: AdminDashboardProps) => {
     if (activeTab === 'profile') return 'My Profile';
     const item = menuItems.find(item => item.id === activeTab);
     return item?.label || 'Dashboard';
-  };
-
-  const handleBankDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditBankDetails({ ...editBankDetails, [e.target.name]: e.target.value });
-  };
-
-  const handleBankDetailsSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setBankLoading(true);
-    try {
-      await axios.post(`${API_BASE_URL}/api/auth/maintenance/bank-details`, {
-        apartmentCode: user.apartmentCode,
-        ...editBankDetails
-      });
-      setBankDetails(editBankDetails);
-      toast({ title: 'Success', description: 'Bank details updated' });
-    } catch (err) {
-      toast({ title: 'Error', description: 'Failed to update bank details', variant: 'destructive' });
-    }
-    setBankLoading(false);
   };
 
   return (
@@ -229,7 +180,7 @@ const AdminDashboard = ({ user }: AdminDashboardProps) => {
 
         {/* Content */}
         <main className="flex-1 overflow-auto p-4 lg:p-6">
-          {activeTab === 'profile' && <ProfilePage user={user} />}
+          {activeTab === 'profile' && <ProfilePage user={user as any} />}
           {activeTab === 'overview' && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
@@ -278,7 +229,7 @@ const AdminDashboard = ({ user }: AdminDashboardProps) => {
 
           {activeTab === 'tickets' && <TicketManagement user={user} />}
           {activeTab === 'neighbors' && (
-            <NeighborsList
+            <AdminNeighborsList
               apartmentCode={user.apartmentCode || ''}
               currentUserFlatNumber={user.flatNumber}
             />
