@@ -29,7 +29,7 @@ A **modern, full-stack web application** for managing apartment communities, bui
 - Create and track maintenance tickets  
 - View ticket status and history  
 - View and contact neighbors  
-- See maintenance payment history  
+- See maintenance payment history
 
 ### 🧑‍💼 Admins
 - Real-time dashboard with ticket stats  
