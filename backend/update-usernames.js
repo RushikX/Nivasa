@@ -7,7 +7,7 @@ mongoose.connect(process.env.MONGO_URI)
     .catch((err) => console.error('MongoDB connection error:', err));
 
 // Import User model
-const User = require('./models/user');
+const User = require('./models/User');
 
 async function updateUsernames() {
     try {

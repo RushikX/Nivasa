@@ -4,7 +4,7 @@ const Apartment = require("../models/Apartment");
 const Complaint = require("../models/Complaint");
 const MaintenancePayment = require("../models/MaintenancePayment");
 const bcrypt = require("bcryptjs");
-const User = require('../models/user');
+const User = require('../models/User');
 
 // -- Register Apartment
 router.post("/register-apartment", async (req, res) => {
