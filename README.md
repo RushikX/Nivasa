@@ -1,5 +1,10 @@
 # 🏢 Nivasa — Apartment Administration System
 
+Contributors:
+<a href="https://github.com/sai117/Nivasa/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=sai117/Nivasa" />
+</a>
+
 A **modern, full-stack web application** for managing apartment communities, built with **React**, **Node.js**, **Express**, and **MongoDB**.
 
 ---
