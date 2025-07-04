@@ -28,7 +28,7 @@ A **modern, full-stack web application** for managing apartment communities, bui
 
 ---
 
-## ✨ Features
+## ✨ Features:
 
 ### 🧑‍💼 Tenants
 - Create and track maintenance tickets  
