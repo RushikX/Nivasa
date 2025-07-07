@@ -5,6 +5,8 @@ Contributors:
   <img src="https://contrib.rocks/image?repo=sai117/Nivasa" />
 </a>
 
+Made with [contrib.rocks](https://contrib.rocks).
+
 A **modern, full-stack web application** for managing apartment communities, built with **React**, **Node.js**, **Express**, and **MongoDB**.
 
 ---
