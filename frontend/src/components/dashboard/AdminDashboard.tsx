@@ -19,6 +19,7 @@ import CreateTicketForm from '../tickets/CreateTicketForm';
 import axios from 'axios';
 import { Input } from '@/components/ui/input';
 import TechnicianManagement from '@/components/technicians/TechnicianManagement';
+import API_BASE_URL from '@/config/api';
 
 interface AdminUser {
   username?: string;
@@ -43,7 +44,7 @@ const AdminDashboard = ({ user }: AdminDashboardProps) => {
     let intervalId: NodeJS.Timeout;
     const fetchStats = async () => {
       try {
-        const res = await axios.get(`https://nivasa-production-7aa9.up.railway.app/api/auth/stats/${user.apartmentCode}`);
+        const res = await axios.get(`${API_BASE_URL}/api/auth/stats/${user.apartmentCode}`);
         setStats(res.data);
       } catch (err) {
         console.error('Failed to fetch ticket stats:', err);

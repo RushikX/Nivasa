@@ -7,9 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import axios from 'axios';
-
-// Get the current domain for API calls
-const API_BASE_URL = window.location.origin;
+import API_BASE_URL from '@/config/api';
 
 const RegisterApartment = () => {
   const [apartmentName, setApartmentName] = useState('');

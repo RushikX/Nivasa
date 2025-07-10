@@ -5,6 +5,7 @@ import TenantDashboard from "@/components/dashboard/TenantDashboard";
 import { toast } from "@/hooks/use-toast";
 import axios from "axios";
 import type { User } from "@/components/profile/ProfilePage";
+import API_BASE_URL from '@/config/api';
 
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -31,8 +32,7 @@ const Dashboard = () => {
 
     const validateUser = async () => {
       try {
-        const res = await axios.post(
-          "https://nivasa-production-7aa9.up.railway.app/api/auth/validate",
+        const res = await axios.get(`${API_BASE_URL}/api/auth/validate`,
           {
             phoneNumber: phone,
           }

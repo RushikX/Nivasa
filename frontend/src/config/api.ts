@@ -1,5 +1,5 @@
 // Hardcoded Railway API URL
-const API_BASE_URL = "https://nivasa-production-7aa9.up.railway.app";
+const API_BASE_URL = "https://nivasa-production.up.railway.app";
 
 export const API_ENDPOINTS = {
   // Auth endpoints

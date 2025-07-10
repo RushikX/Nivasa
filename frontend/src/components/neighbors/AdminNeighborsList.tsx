@@ -8,6 +8,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Phone, Mail, Users, Home, User, Edit, Trash2, Search, Plus } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import axios from 'axios';
+import API_BASE_URL from '@/config/api';
 
 interface Neighbor {
     username: string;
@@ -75,7 +76,7 @@ const AdminNeighborsList = ({ apartmentCode, currentUserFlatNumber }: AdminNeigh
         setError(null);
 
         try {
-            const response = await axios.get(`https://nivasa-production-7aa9.up.railway.app/api/auth/neighbors/${apartmentCode}`);
+            const response = await axios.get(`${API_BASE_URL}/api/auth/neighbors/${apartmentCode}`);
             setNeighbors(response.data.neighbors || []);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to fetch neighbors');
@@ -114,7 +115,7 @@ const AdminNeighborsList = ({ apartmentCode, currentUserFlatNumber }: AdminNeigh
                 }
             }
 
-            await axios.put(`https://nivasa-production-7aa9.up.railway.app/api/auth/update-resident/${editingNeighbor._id}`, {
+            await axios.put(`${API_BASE_URL}/api/auth/update-resident/${editingNeighbor._id}`, {
                 username: editFormData.username,
                 phoneNumber: editFormData.phoneNumber,
                 flatNumber: editFormData.flatNumber,
@@ -151,7 +152,7 @@ const AdminNeighborsList = ({ apartmentCode, currentUserFlatNumber }: AdminNeigh
         setIsDeleting(true);
         try {
             console.log('Attempting to delete resident:', neighbor._id);
-            const response = await axios.delete(`https://nivasa-production-7aa9.up.railway.app/api/auth/delete-resident/${neighbor._id}`);
+            const response = await axios.delete(`${API_BASE_URL}/api/auth/delete-resident/${neighbor._id}`);
             console.log('Delete response:', response.data);
 
             toast({

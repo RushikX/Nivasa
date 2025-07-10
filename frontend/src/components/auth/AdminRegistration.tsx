@@ -13,9 +13,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import axios from "axios"; // Import axios
-
-// Get the current domain for API calls
-const API_BASE_URL = window.location.origin;
+import API_BASE_URL from '@/config/api';
 
 const AdminRegistration = () => {
   const [formData, setFormData] = useState({

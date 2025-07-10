@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import axios from "axios";
+import API_BASE_URL from '@/config/api';
 
 interface LoginFormProps {
   onBack: () => void;
@@ -31,7 +32,7 @@ const LoginForm = ({ onBack, onSwitchToSignup }: LoginFormProps) => {
     setIsLoading(true);
 
     try {
-      const res = await axios.post("https://nivasa-production-7aa9.up.railway.app/api/auth/login", {
+      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, {
         phoneNumber: phone,
         password,
       });

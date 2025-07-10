@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import axios from "axios";
+import API_BASE_URL from '@/config/api';
 
 const ResidentRegistration = () => {
   const [formData, setFormData] = useState({
@@ -55,7 +56,7 @@ const ResidentRegistration = () => {
 
     try {
       const response = await axios.get(
-        `https://nivasa-production-7aa9.up.railway.app/api/auth/check-flat-availability?flatNumber=${encodeURIComponent(formData.flatNumber)}&apartmentCode=${encodeURIComponent(formData.apartmentCode)}`
+        `${API_BASE_URL}/api/auth/check-flat-availability?flatNumber=${encodeURIComponent(formData.flatNumber)}&apartmentCode=${encodeURIComponent(formData.apartmentCode)}`
       );
 
       setFlatNumberStatus({
@@ -87,7 +88,7 @@ const ResidentRegistration = () => {
 
     setIsLoading(true);
     try {
-      await axios.post("https://nivasa-production-7aa9.up.railway.app/api/auth/signup-resident", {
+      await axios.post(`${API_BASE_URL}/api/auth/signup-resident`, {
         username: formData.username,
         phoneNumber: formData.phone,
         flatNumber: formData.flatNumber,
