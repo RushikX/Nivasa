@@ -32,11 +32,7 @@ const Dashboard = () => {
 
     const validateUser = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/auth/validate`,
-          {
-            phoneNumber: phone,
-          }
-        );
+        const res = await axios.post(`${API_BASE_URL}/api/auth/validate`, { phoneNumber: phone });
         console.log('Dashboard received user data from validate:', res.data);
         console.log('🔍 User apartmentCode:', res.data.apartmentCode);
         console.log('🔍 User role:', res.data.role);
