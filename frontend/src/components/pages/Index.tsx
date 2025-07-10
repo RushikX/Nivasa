@@ -47,33 +47,7 @@ const Index = () => {
     },
   ];
 
-  const contributors = [
-    {
-      name: "Viriyala Dinesh",
-      linkedin: "https://www.linkedin.com/in/dinesh-viriyala-770912277/",
-      github: "https://github.com/dineshviriyala",
-    },
-    {
-      name: "Bhargav Padala",
-      linkedin: "https://www.linkedin.com/in/bhargav-padala-b636ab24a/",
-      github: "https://github.com/Bharyy",
-    },
-    {
-      name: "Yerra Rushik kumar",
-      linkedin: "https://www.linkedin.com/in/rushik-yerra-20372821b/", // Replace with actual
-      github: "https://github.com/RushikX",
-    },
-    {
-      name: "Karri Sai Chetan",
-      linkedin: "https://www.linkedin.com/in/saichetan117/ ", // Replace with actual
-      github: "https://github.com/SaiChetan338",
-    },
-    {
-      name: "Penupala Nitin",
-      linkedin: "https://github.com/Nitin-Penupala", // Replace with actual
-      github: "https://www.linkedin.com/in/nitin-penupala/",
-    },
-  ];
+  
 
   if (showLogin) {
     return (
@@ -193,39 +167,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Site made by Section */}
-      <section className="py-8 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">
-            Site made by:
-          </h3>
-          <ul className="inline-block text-gray-600 text-lg space-y-2">
-            {contributors.map((person, idx) => (
-              <li
-                key={idx}
-                className="flex items-center justify-center space-x-3"
-              >
-                <a
-                  href={person.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Linkedin className="w-5 h-5 hover:text-blue-600" />
-                </a>
-                <a
-                  href={person.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Github className="w-5 h-5 hover:text-gray-800" />
-                </a>
-                <span>{person.name}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
+      
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
