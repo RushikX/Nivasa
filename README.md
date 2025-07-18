@@ -8,7 +8,7 @@ A **modern, full-stack web application** for managing apartment communities, bui
 
 ##  Live Demo
 
->  [nivasa-production.up.railway.app](nivasa-production.up.railway.app)
+>  [website](https://nivasa-production.up.railway.app/)
 
 
 
