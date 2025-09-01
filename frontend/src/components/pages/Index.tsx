@@ -25,11 +25,7 @@ const Index = () => {
   const [showLogin, setShowLogin] = useState(false);
 
   const features = [
-    {
-      icon: Wrench,
-      title: "Easy Ticket Management",
-      description: "Report and track maintenance issues with just a few clicks",
-    },
+    
     {
       icon: Users,
       title: "Tenant Communication",
@@ -119,53 +115,10 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Everything You Need to Manage Your Property
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From tenant requests to technician management, we've got you
-              covered.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <Card
-                key={index}
-                className="text-center hover:shadow-lg transition-shadow duration-300"
-              >
-                <CardHeader>
-                  <div className="mx-auto bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                    <feature.icon className="h-8 w-8 text-blue-600" />
-                  </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-gray-600">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      
 
       {/* CTA Section */}
-      <section className="py-20 bg-blue-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Transform Your Property Management?
-          </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join hundreds of property managers who have streamlined their
-            operations with Nivasa.
-          </p>
-        </div>
-      </section>
+      
 
       
 

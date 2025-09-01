@@ -5,7 +5,7 @@ const path = require('path');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 5000; // Vercel will set its own PORT
+const PORT = process.env.PORT || 8080; // Vercel will set its own PORT
 
 // Middleware
 app.use(cors({
