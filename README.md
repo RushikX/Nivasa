@@ -26,7 +26,7 @@ A **modern, full-stack web application** for managing apartment communities, bui
 - Approve/reject maintenance payments  
 - Set maintenance fees and bank details  
 
-### ⚙ General
+### General
 - Role-based dashboards (Admin/Tenant)  
 - Responsive UI (desktop & mobile)  
 - Real-time notifications (toasts)  
@@ -122,3 +122,4 @@ Please open an issue first to discuss major changes.
 
 **Built with ❤️ for apartment communities.**
 "# Nivasa" 
+
