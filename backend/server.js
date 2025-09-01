@@ -9,10 +9,12 @@ const PORT = process.env.PORT || 8080; // Vercel will set its own PORT
 
 // Middleware
 app.use(cors({
-  origin: true, // Allow all origins for debugging
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
+  origin: process.env.NODE_ENV === 'production'
+    ? [process.env.CLIENT_URL]
+    : ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:8081'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 app.use(express.json());
 
