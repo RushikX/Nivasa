@@ -8,7 +8,7 @@ A **modern, full-stack web application** for managing apartment communities, bui
 
 ##  Live Demo
 
->  [website](https://nivasa-production.up.railway.app/)
+>  [website Link - Live Demo](https://nivasa-vert.vercel.app)
 
 
 
@@ -52,6 +52,7 @@ cd ../frontend
 npm install
 npm run dev
 ```
+
 
 
 
