@@ -107,15 +107,7 @@ const Index = () => {
       {/* Features Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-blue-90">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              What Our Platform
-              <span className="text-black-600 block mt-1">Offers</span>
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Essential features for managing apartment complexes efficiently.
-            </p>
-          </div>
+          
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6">
             {features.map((feature, index) => (
